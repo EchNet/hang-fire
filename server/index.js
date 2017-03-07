@@ -106,6 +106,8 @@ server.use("/", require("./routers/alpha"));
 server.use("/api", require("./api"));
 server.use("/admin", require("./routers/admin"));
 server.use("/assets", require("./routers/assets"));
+server.use("/createReminder", require("./routers/createReminder"));
+server.use("/getAllReminderMessages", require("./routers/getAllReminderMessages"));
 
 function setAdminKey() {
   const random = require("./util/random");

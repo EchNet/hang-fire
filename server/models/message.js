@@ -10,6 +10,8 @@ module.exports = function(sequelize, DataTypes) {
   const PROFILE_TYPE = 2;
   const ANNOUNCEMENT_TO_ALL_TYPE = 3;
   const ANNOUNCEMENT_TO_NEW_TYPE = 4;
+  const REMINDER_TYPE = 5;
+    
   const MAX_TYPE = 4;
 
   function schema() {
@@ -144,6 +146,50 @@ module.exports = function(sequelize, DataTypes) {
     });
   }
 
+ function findCurrentRemindersforUser(toUserId) {
+     return Message.findAll({
+      where: { toUserId: toUserId, type: REMINDER_TYPE },
+      include: [{
+        model: models.User,
+        as: "fromUser",
+        required: true
+      }],
+      include: [{
+        model: models.User,
+        as: "toUser",
+        required: true
+      },
+      {
+        model: models.Asset,
+        as: "asset"  
+      }],     
+      order: [ [ "createdAt", "ASC" ] ]
+    })
+     
+ }    
+
+ function findCurrentRemindersforSender (fromUserId) {
+     return Message.findAll({
+          where: { fromUserId: fromUserId , type: REMINDER_TYPE },
+      include: [{
+        model: models.User,
+        as: "fromUser",
+        required: true
+      }],
+      include: [{
+        model: models.User,
+        as: "toUser",
+        required: true
+      },
+      {
+        model: models.Asset,
+        as: "asset"  
+      }],     
+      order: [ [ "createdAt", "ASC" ] ]
+    })
+     
+ }     
+    
   function findByReceiver(toUserId, options) {
     return findAllWhere({
       "toUserId": toUserId
@@ -182,6 +228,8 @@ module.exports = function(sequelize, DataTypes) {
       destroyById: destroyById,
       findAnnouncements: findAnnouncements,
       findCurrentAnnouncementsForUser: findCurrentAnnouncementsForUser,
+      findCurrentRemindersforUser: findCurrentRemindersforUser,
+      findCurrentRemindersforSender: findCurrentRemindersforSender,      
       findById: findById,
       findByReceiver: findByReceiver,
       findByUserIds: findByUserIds
@@ -193,6 +241,7 @@ module.exports = function(sequelize, DataTypes) {
   Message.PROFILE_TYPE = PROFILE_TYPE;
   Message.ANNOUNCEMENT_TO_ALL_TYPE = ANNOUNCEMENT_TO_ALL_TYPE;
   Message.ANNOUNCEMENT_TO_NEW_TYPE = ANNOUNCEMENT_TO_NEW_TYPE;
+  Message.REMINDER_TYPE = REMINDER_TYPE;
   Message.MAX_TYPE = MAX_TYPE;
 
   return Message;
