@@ -23,8 +23,8 @@ const DEFAULTS = {
     }
   },
   auth: {
-    grantAdminToLocalRequest: false,
-    enableExtHeaderAccess: false
+    grantAdminToLocalRequest: true,
+    enableExtHeaderAccess: true
   },
   clientServiceConfigurations: {
     apiService: {
