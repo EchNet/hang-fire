@@ -3,6 +3,7 @@ const Moment = require('moment-timezone');
 const exec = require('../server/util/exec');
 
 const A_FEW_MINUTES = 10;
+const TOO_LATE = 100;
 const ONE_DAY = 24*60 - A_FEW_MINUTES;
 
 function applyTimeZone(moment, timeZone) {
@@ -31,8 +32,10 @@ function applyTimeZone(moment, timeZone) {
   return moment;
 }
 
+// TODO: if it's too late, log and apologize.
 function yetDue(targetTime, now) {
-  return now.diff(targetTime, "minutes") <= A_FEW_MINUTES;
+  var diffMinutes = targetTime.diff(now, "minutes");
+  return diffMinutes <= A_FEW_MINUTES && diffMinutes >= -TOO_LATE;
 }
 
 function sameTimeToday(date, now) {
@@ -61,7 +64,6 @@ function sendRightNow(reminder, rightNow) {
   }
 
   // Is this reminder active yet?
-  // TODO: don't deliver reminders more than an hour late; instead, log and apologize.
   deliverAt = applyTimeZone(Moment(deliverAt), timeZone);
   if (!deliverAt || !yetDue(deliverAt, rightNow)) { 
     return false;
