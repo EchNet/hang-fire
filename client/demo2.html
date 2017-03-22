@@ -1,0 +1,150 @@
+<html>
+<h1>Choose a time for your scheduled reminder</h1>
+<div id="container">
+</div>
+
+<!-- optionality/attributes -->
+<div id="timeControls">
+<p>Time:</p>
+<select name= "timeParameters" id="time">
+  	<option value="12:00">12:00</option> 
+  	<option value="12:30">12:30</option>
+	<option value="1:00">1:00</option>
+  	<option value="1:30">1:30</option>
+	<option value="2:00">2:00</option>
+  	<option value="2:30">2:30</option>
+	<option value="3:00">3:00</option>
+  	<option value="3:30">3:30</option>
+	<option value="4:00">4:00</option>
+  	<option value="4:30">4:30</option>
+	<option value="5:00">5:00</option>
+  	<option value="5:30">5:30</option>
+	<option value="6:00">6:00</option>
+ 	<option value="6:30">6:30</option>
+	<option value="7:00">7:00</option>
+  	<option value="7:30">7:30</option>
+	<option value="8:00">8:00</option>
+  	<option value="8:30">8:30</option>
+	<option value="9:00">9:00</option>
+  	<option value="9:30">9:30</option>
+	<option value="10:00">10:00</option>
+  	<option value="10:30">10:30</option>
+	<option value="11:00">11:00</option>
+  	<option value="11:30">11:30</option>
+</select>
+<select name= "dayParameters" id="AM or PM">
+  <option value="PM">PM</option>
+  <option value="AM">AM</option>
+</select>
+</div>
+
+<form>
+<div id="timezoneControls">
+<p>Select time zone</p>
+<select name = "timezoneParameters" id="timeZone">
+	<option value="EST" id="EST">Eastern Standard Time (EST)</option>
+	<option value="CST" id="CST">Central Standard Time (CST)</option>
+	<option value="MST" id="MST">Mountain Standard Time (MST)</option>
+	<option value="PST" id="PST">Pacific Standard Time (PST)</option>
+</select>
+</div>
+</form>
+
+<div id="repeatControls">
+<p>Select repeat schedule</p>
+<select name = "repeatParameters" id = "repeat">
+	<option value="once" id="repeatonce">Only Once</option>
+	<option value="daily" id="daily">Daily</option>
+	<option value="weekly" id="weekly">Weekly</option>
+</select>
+</div>
+
+
+<br>
+<div>
+<!-- <button id="submit">Set Reminder</button> -->
+<button onClick="clickHandler()" id="submit">Set Reminder</button> 
+<p id="demo"></p>
+</div>
+
+
+<script>
+//initialize buttons from HTML markup
+var time = document.getElementById("timeControls");
+var repeat = document.getElementById("repeatControls");
+var daily = document.getElementById("daily");
+var weekly = document.getElementById("weekly");
+var onetime = document.getElementById("onetime");
+var timezone = document.getElementById("timezoneControls");
+var eastern = document.getElementById("eastern");
+var central = document.getElementById("central");
+var mountain = document.getElementById("mountain");
+var pacific = document.getElementById("pacific");
+var submit = document.getElementById("submit");
+
+//JS version for drop down box
+//Needs Jquery
+var div = document.querySelector("#container"),
+frag = document.createDocumentFragment(),
+select = document.createElement("select");
+
+select.options.add( new Option("test1","AU") );
+select.options.add( new Option("test2","FI") );
+select.options.add( new Option("test3","FI") );
+
+frag.appendChild(select);
+div.appendChild(frag);
+
+var div = document.querySelector("#container"),
+frag = document.createDocumentFragment(),
+select = document.createElement("select");
+
+select.options.add( new Option("test1","AU") );
+select.options.add( new Option("test2","FI") );
+select.options.add( new Option("test3","FI") );
+
+frag.appendChild(select);
+div.appendChild(frag);
+
+//set reminder 
+function clickHandler(){
+	var s = document.getElementsByName('timeParameters')[0];
+	var text = s.options[s.selectedIndex].text;
+	var value = s.options[s.selectedIndex].value;
+	
+	var t = document.getElementsByName('dayParameters')[0];
+	var texttwo = t.options[t.selectedIndex].text;
+	var valuetwo = t.options[t.selectedIndex].value;
+	
+	var u = document.getElementsByName('repeatParameters')[0];
+	var textthree = u.options[u.selectedIndex].text;
+	var valuethree = u.options[u.selectedIndex].value;
+	
+	var v = document.getElementsByName('timezoneParameters')[0];
+	var textfour = v.options[v.selectedIndex].text;
+	var valuefour = v.options[v.selectedIndex].value;
+
+	if(valuethree == "weekly"){
+		//call backend
+	} else if(valuethree == "once"){
+		//backend
+	} else{
+		//backend
+	} 
+		
+	if(valuefour == "CST"){
+		//call backend
+	} else if(valuefour == "EST"){
+		//backend
+	} else if(valuefour == "PST"){
+		//backend
+	} else{
+		//backend
+	}
+	
+	document.getElementById("demo").innerHTML = "Your reminder will be delivered: "+textthree+" at "+text+" "+texttwo+" "+textfour+".";
+}
+
+
+</script>
+</html>
