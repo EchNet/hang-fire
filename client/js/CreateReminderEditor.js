@@ -11,7 +11,7 @@ function($,        Activity,   VideoRecorder,   ui) {
 
     c.defineProperty("deliverAt", {
       get: function() {
-        return "";
+        return this.deliverAtSelector.value;
       }
     });
 
@@ -30,6 +30,12 @@ function($,        Activity,   VideoRecorder,   ui) {
     c.defineInitializer(function() {
       var self = this;
 
+      self.deliverAtSelector = new ui.DropDown("<select>", {
+        options: [
+          //{ label: "do", value: 0 }, { label: "re", value: 1 }, { label: "mi", value: 2 }
+        ]
+      });
+
       self.okButton = ui.Button.create("Record a message", function() {
         self.invokePlugin("openVideoRecorder");
       });
@@ -38,6 +44,8 @@ function($,        Activity,   VideoRecorder,   ui) {
         .append($("<div>").addClass("panel")
           .append($("<div>")
             .text("Schedule a message to be delivered."))
+          .append($("<div>")
+            .append(self.deliverAtSelector.ele))
           .append($("<div class='subtle'>")
             .text("(put editor components here)"))
           .append($("<div>")
@@ -83,7 +91,8 @@ function($,        Activity,   VideoRecorder,   ui) {
         return this.saveForm($.extend({}, this.data, {
           assetId: assetId,
           deliverAt: this.scheduleEditor.deliverAt,
-          timeZone: this.scheduleEditor.timeZone
+          timeZone: this.scheduleEditor.timeZone,
+          repeat: this.scheduleEditor.repeatHow
         }));
       },
       close: function() {

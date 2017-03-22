@@ -8,6 +8,7 @@
     "Component",
     "ConfirmButton",
     "DateTimeInput",
+    "DropDown",
     "EmailInput",
     "FadeGoal",
     "Image",
