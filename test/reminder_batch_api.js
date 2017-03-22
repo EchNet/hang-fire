@@ -7,6 +7,7 @@ requestlc.describe("Reminders processing", function(client) {
   const PATH = "/api/reminders";
 
   const ONE_HOUR = 60 * 60 * 1000;
+  const ONE_DAY = 24 * ONE_HOUR;
 
   function postReminder(data) {
     return client.makeRequest("POST", PATH).asUser(80).withData(extend({
@@ -19,7 +20,7 @@ requestlc.describe("Reminders processing", function(client) {
   function processReminders(date) {
     var uri = PATH + "/refresh";
     if (date) {
-      uri += "?date=" + encodeURIComponent(processAt.toISOString());
+      uri += "?date=" + encodeURIComponent(date.toISOString());
     }
     return client.makeRequest("POST", uri).asRoot().getJson();
   }
@@ -81,7 +82,6 @@ requestlc.describe("Reminders processing", function(client) {
   });
 
   it("expires non-repeat message", function(done) {
-    var deliverAt = new Date();
     postReminder({ deliverAt: new Date().toISOString() })
     .then(function(reminder) {
       return processReminders();
@@ -94,6 +94,28 @@ requestlc.describe("Reminders processing", function(client) {
     .then(function(result) {
       expect(result.activeReminders.length).to.equal(0);
       expect(result.messagesSent.length).to.equal(0);
+      done();
+    })
+    .catch(done);
+  });
+
+  it("sends second message the next day for repeating reminder", function(done) {
+    var deliverAt = new Date();
+    postReminder({
+      deliverAt: deliverAt.toISOString(),
+      repeat: 1
+    })
+    .then(function(reminder) {
+      return processReminders();
+    })
+    .then(function(result) {
+      expect(result.activeReminders.length).to.equal(1);
+      expect(result.messagesSent.length).to.equal(1);
+      return processReminders(new Date(deliverAt.getTime() + ONE_DAY));
+    })
+    .then(function(result) {
+      expect(result.activeReminders.length).to.equal(1);
+      expect(result.messagesSent.length).to.equal(1);
       done();
     })
     .catch(done);

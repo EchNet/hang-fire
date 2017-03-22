@@ -6,10 +6,8 @@ const A_FEW_MINUTES = 10;
 const TOO_LATE = 100;
 const ONE_DAY = 24*60 - A_FEW_MINUTES;
 
-function applyTimeZone(moment, timeZone) {
-
-  var tz;
-  switch (timeZone) {
+function unaliasTimeZone(tz) {
+  switch (tz) {
   case "Eastern":
     tz = "America/New_York";
     break;
@@ -25,134 +23,145 @@ function applyTimeZone(moment, timeZone) {
   case "IST":
     tz = "Asia/Kolkata";
   }
-
-  if (tz) {
-    moment.tz(tz);
-  }
-  return moment;
+  return tz;
 }
 
-// TODO: if it's too late, log and apologize.
-function yetDue(targetTime, now) {
-  var diffMinutes = targetTime.diff(now, "minutes");
-  return diffMinutes <= A_FEW_MINUTES && diffMinutes >= -TOO_LATE;
+function minutesDiff(m1, m2) {
+  return m1.diff(m2, "minutes");
 }
 
-function sameTimeToday(date, now) {
-  date = date.clone();
-  date.setYear(now.getYear());
-  date.setMonth(now.getMonth());
-  return date;
+function Reminder(model) {
+  this.tz = unaliasTimeZone(model.timeZone);
+  this.deliverAt = model.deliverAt && Moment(model.deliverAt).tz(this.tz);
+  this.lastDeliveredAt = model.lastDeliveredAt && Moment(model.lastDeliveredAt);
+  this.repeat = model.repeat;
+  this.model = model;
 }
 
-function sendRightNow(reminder, rightNow) {
-  var deliverAt = Moment(reminder.deliverAt);
-  if (!deliverAt.isValid()) {
-    console.error("bad delivery date", reminder.deliverAt);
+Reminder.prototype = {
+
+  validate: function() {
+    if (!this.deliverAt || !this.deliverAt.isValid()) {
+      return false;
+    }
+    if (this.lastDeliveredAt && !this.lastDeliveredAt.isValid()) {
+      return false;
+    }
+    return true;
+  },
+
+  nextDeliveryTime: function(rightNow) {
+    var reminder = this;
+
+    // Get the first delivery time. It's already in the correct time zone.
+    var deliverAt = reminder.deliverAt;
+    if (deliverAt) {
+
+      // If it's in the future, or at least not too far in the past, that's the one.
+      if (minutesDiff(deliverAt, rightNow) > -TOO_LATE) { 
+        return deliverAt;
+      }
+
+      if (reminder.repeat == 1) {  // Repeat daily.
+        var sameTimeToday = Moment(rightNow)
+          .hour(deliverAt.hour())
+          .minute(deliverAt.minute());
+        var diff = minutesDiff(sameTimeToday, rightNow);
+        if (diff > -TOO_LATE) {
+          return sameTimeToday;
+        }
+        // Otherwise, same time tomorrow.
+        // TODO: this isn't quite right in the case that a TZ offset transition falls into this period.
+        return Moment(sameTimeToday).add(24, "hours");
+      }
+    }
+    // TODO: if we miss a delivery, log and apologize.
+
+    return null;
+  },
+
+  isDue: function(rightNow) {
+    var reminder = this;
+
+    // Ignore reminder that has already been delivered.
+    if (!reminder.lastDeliveredAt ||
+        (reminder.repeat && minutesDiff(rightNow, reminder.lastDeliveredAt) > TOO_LATE)) {
+
+      // Deliver reminder if its time is due.
+      var deliverAt = reminder.nextDeliveryTime(rightNow);
+      if (deliverAt) {
+        var diffMinutes = minutesDiff(deliverAt, rightNow);
+        return diffMinutes <= A_FEW_MINUTES;
+      }
+    }
+
     return false;
-  }
+  },
 
-  var timeZone = reminder.timeZone;
-  var lastDeliveredAt = reminder.lastDeliveredAt;
-
-  // Ignore reminder that triggered within the last day.
-  if (lastDeliveredAt) {
-    lastDeliveredAt = Date.parse(lastDeliveredAt);
-    if (rightNow.diff(lastDeliveredAt, "minutes") < ONE_DAY) {
-      return false;
-    }
-  }
-
-  // Is this reminder active yet?
-  deliverAt = applyTimeZone(Moment(deliverAt), timeZone);
-  if (!deliverAt || !yetDue(deliverAt, rightNow)) { 
-    return false;
-  }
-
-  if (reminder.repeat) {
-    // Put the time into the local time zone.
-    rightNow = applyTimeZone(rightNow, timeZone);
-    deliverAt = sameTimeToday(deliverAt, rightNow);
-    if (!yetDue(deliverAt, rightNow)) {
-      return false;
-    }
-  }
-  else {
-    // If the reminder does not repeat, send it only once.
-    if (lastDeliveredAt) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
-function remindersToSend(reminders, rightNow) {
-  var result = [];
-  reminders.forEach(function(reminder) {
-    if (sendRightNow(reminder, rightNow)) {
-      result.push(reminder);
-    }
-  });
-  return result;
-}
-
-function makeReminderSender(reminder, messagesSent) {
-  return function() {
-    return models.Message.create({
+  messageData: function() {
+    var reminder = this;
+    return {
       type: models.Message.REMINDER_TYPE,
-      fromUserId: reminder.fromUserId,
-      toUserId: reminder.toUserId,
-      assetId: reminder.assetId
-    })
-    .then(function(message) {
-      messagesSent.push(message);
-      return reminder.update({
-        expired: reminder.repeat ? 0 : 1,
-        lastDeliveredAt: new Date()
-      });
+      fromUserId: reminder.model.fromUserId,
+      toUserId: reminder.model.toUserId,
+      assetId: reminder.model.assetId
+    }
+  },
+
+  updateModel: function(message) {
+    var reminder = this;
+    return reminder.model.update({
+      expired: reminder.model.repeat ? 0 : 1,
+      lastDeliveredAt: message.createdAt
     });
+  },
+
+  makeSender: function(refreshReminders) {
+    var reminder = this;
+    return function() {
+      return models.Message.create(reminder.messageData())
+      .then(function(message) {
+        refreshReminders.messagesSent.push(message);
+        return reminder.updateModel(message);
+      });
+    }
   }
-}
-
-function mapToReminderSenders(remindersToSend, messagesSent) {
-  var result = [];
-  remindersToSend.forEach(function(reminder) {
-    result.push(makeReminderSender(reminder, messagesSent));
-  });
-  return result;
-}
-
-function processReminders() {
-  var rightNow = Moment(this.date);
-
-  return new Promise(function(resolve) {
-    var activeReminders = [];
-    var messagesSent = [];
-
-    resolve(models.Reminder.findAll({
-      where: { expired: 0 }
-    })
-    .then(function(reminders) {
-      activeReminders = reminders;
-      reminderSenders = mapToReminderSenders(remindersToSend(reminders, rightNow), messagesSent);
-      return exec.executeGroup(this, reminderSenders);
-    })
-    .then(function() {
-      return {
-        activeReminders: activeReminders,
-        messagesSent: messagesSent
-      };
-    }))
-  });
-}
+};
 
 function RefreshReminders(date) {
   this.date = date;
+  this.activeReminders = [];
+  this.messagesSent = [];
+}
+
+function RefreshReminders_sendMessagesDue(self) {
+  var rightNow = Moment(self.date);
+  var reminders = self.activeReminders;
+  var reminderSenders = [];
+  reminders.forEach(function(reminder) {
+    if (reminder.validate() && reminder.isDue(rightNow)) {
+      reminderSenders.push(reminder.makeSender(self));
+    }
+  });
+  return exec.executeGroup(self, reminderSenders);
 }
 
 RefreshReminders.prototype = {
-  processReminders: processReminders
+  processReminders: function() {
+    var self = this;
+    return models.Reminder.findAll({
+      where: { expired: 0 }
+    })
+    .then(function(models) {
+      self.activeReminders = models.map(function(ele) {
+        return new Reminder(ele);
+      });
+      return RefreshReminders_sendMessagesDue(self);
+    })
+    .then(function() {
+      return self;
+    });
+  }
 };
 
 module.exports = RefreshReminders;
