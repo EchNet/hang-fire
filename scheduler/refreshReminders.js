@@ -1,146 +1,167 @@
-var models = require('../server/models/index');
-var Moment = require('moment-timezone');
-    
-    var currentDateTime = Date.now();
-    console.log('Refreshing reminders!! for ' + 'bridget.pillai@gmail.com' + 'at ' + currentDateTime);
-    
-    models.Reminders.findAll({ attributes: ['id', 'status', 'deliverAt', 'timeZone', 'Repeat', 'Expired' , 'lastDeliveredAt'],
-    where: {
-           $not: [ { Expired : 'Yes' } ]}
-          }).then(function(Reminders) {
-        if (!Reminders) {
-          console.log("Zero Notifications!");
+const models = require('../server/models/index');
+const Moment = require('moment-timezone');
+const exec = require('../server/util/exec');
+
+const A_FEW_MINUTES = 10;
+const TOO_LATE = 100;
+const ONE_DAY = 24*60 - A_FEW_MINUTES;
+
+function unaliasTimeZone(tz) {
+  switch (tz) {
+  case "Eastern":
+    tz = "America/New_York";
+    break;
+  case "Central":
+    tz = "America/Chicago";
+    break;
+  case "Mountain":
+    tz = "America/Denver";
+    break;
+  case "Pacific":
+    tz = "America/Los_Angeles";
+    break;
+  case "IST":
+    tz = "Asia/Kolkata";
+  }
+  return tz;
+}
+
+function minutesDiff(m1, m2) {
+  return m1.diff(m2, "minutes");
+}
+
+function Reminder(model) {
+  this.tz = unaliasTimeZone(model.timeZone);
+  this.deliverAt = model.deliverAt && Moment(model.deliverAt).tz(this.tz);
+  this.lastDeliveredAt = model.lastDeliveredAt && Moment(model.lastDeliveredAt);
+  this.repeat = model.repeat;
+  this.model = model;
+}
+
+Reminder.prototype = {
+
+  validate: function() {
+    if (!this.deliverAt || !this.deliverAt.isValid()) {
+      return false;
+    }
+    if (this.lastDeliveredAt && !this.lastDeliveredAt.isValid()) {
+      return false;
+    }
+    return true;
+  },
+
+  nextDeliveryTime: function(rightNow) {
+    var reminder = this;
+
+    // Get the first delivery time. It's already in the correct time zone.
+    var deliverAt = reminder.deliverAt;
+    if (deliverAt) {
+
+      // If it's in the future, or at least not too far in the past, that's the one.
+      if (minutesDiff(deliverAt, rightNow) > -TOO_LATE) { 
+        return deliverAt;
+      }
+
+      if (reminder.repeat == 1) {  // Repeat daily.
+        var sameTimeToday = Moment(rightNow)
+          .hour(deliverAt.hour())
+          .minute(deliverAt.minute());
+        var diff = minutesDiff(sameTimeToday, rightNow);
+        if (diff > -TOO_LATE) {
+          return sameTimeToday;
         }
-        else {   
-         console.log('Found Reminders, refreshing!');
-         console.log('** from refresh reminder: currentDateTime = ' + new Date(currentDateTime));      
-         Reminders.forEach(function (reminder) {
-        var deliverAt = reminder.deliverAt;
-        var timeZone = reminder.timeZone;
-        var repeat = reminder.Repeat;
-        var id = reminder.id;
-        var lastDeliveredAt = reminder.lastDeliveredAt ;
-        var expired = reminder.Expired;
-        var date = new Date(deliverAt);
-        var rightNow = new Date(currentDateTime);
-        var lastDeliveredAtDate; var actualDeliveryDate;
+        // Otherwise, same time tomorrow.
+        // TODO: this isn't quite right in the case that a TZ offset transition falls into this period.
+        return Moment(sameTimeToday).add(24, "hours");
+      }
+    }
+    // TODO: if we miss a delivery, log and apologize.
 
-        if (lastDeliveredAt != 'Never') { lastDeliveredAtDate = new Date(lastDeliveredAt) };
+    return null;
+  },
 
-console.log("** from refresh reminder: currentDateTime = " + rightNow + "reminder date=" + date + "Reminder id " + id + 'lastDeliveredAt:' + lastDeliveredAt);
+  isDue: function(rightNow) {
+    var reminder = this;
 
-        var newYorkTime = Moment.tz(date, "America/New_York");
-        var losAngeles = newYorkTime.clone().tz("America/Los_Angeles");
-        var centralAmerica = newYorkTime.clone().tz("America/Chicago");
-        var india = newYorkTime.clone().tz("Asia/Kolkata");    
-        var actualDeliveryDateNY = Moment.tz(rightNow, "America/New_York");
+    // Ignore reminder that has already been delivered.
+    if (!reminder.lastDeliveredAt ||
+        (reminder.repeat && minutesDiff(rightNow, reminder.lastDeliveredAt) > TOO_LATE)) {
 
+      // Deliver reminder if its time is due.
+      var deliverAt = reminder.nextDeliveryTime(rightNow);
+      if (deliverAt) {
+        var diffMinutes = minutesDiff(deliverAt, rightNow);
+        return diffMinutes <= A_FEW_MINUTES;
+      }
+    }
 
-         if (timeZone == "Eastern") {
-            deliverAt = newYorkTime.format();
-            actualDeliveryDate = actualDeliveryDateNY.format();
-        } ;
-         if (timeZone == "Central") {
-            deliverAt = centralAmerica.format();
-            actualDeliveryDate = actualDeliveryDateNY.clone().tz("America/Chicago").format();
-        } ;
-         if (timeZone == "Pacific") {
-            deliverAt = losAngeles.format();
-            actualDeliveryDate = actualDeliveryDateNY.clone().tz("America/Los_Angeles").format(); 
-        } ;
-         if (timeZone == "IST") {
-            deliverAt = india.format();
-            actualDeliveryDate = actualDeliveryDateNY.clone().tz("Asia/Kolkata").format();
-        } ;
+    return false;
+  },
 
+  messageData: function() {
+    var reminder = this;
+    return {
+      type: models.Message.REMINDER_TYPE,
+      fromUserId: reminder.model.fromUserId,
+      toUserId: reminder.model.toUserId,
+      assetId: reminder.model.assetId
+    }
+  },
 
-        console.log('actualDeliveryDate: ' + actualDeliveryDate);
+  updateModel: function(message) {
+    var reminder = this;
+    return reminder.model.update({
+      expired: reminder.model.repeat ? 0 : 1,
+      lastDeliveredAt: message.createdAt
+    });
+  },
 
-         var deliverAtHours = date.getHours();
-         var deliverAtMinute = date.getMinutes();
-         var deliverAtDate = date.getDate();
-         var deliverAtMonth = date.getMonth();
+  makeSender: function(refreshReminders) {
+    var reminder = this;
+    return function() {
+      return models.Message.create(reminder.messageData())
+      .then(function(message) {
+        refreshReminders.messagesSent.push(message);
+        return reminder.updateModel(message);
+      });
+    }
+  }
+};
 
-         var nowHours = rightNow.getHours();
-         var nowMinutes = rightNow.getMinutes();
-         var nowDate = rightNow.getDate();
-         var nowMonth = rightNow.getMonth();
+function RefreshReminders(date) {
+  this.date = date;
+  this.activeReminders = [];
+  this.messagesSent = [];
+}
 
-         var lastDeliveredAtHours , lastDeliveredAtMinute, lastDeliveredAtDay, lastDeliveredAtMonth;
+function RefreshReminders_sendMessagesDue(self) {
+  var rightNow = Moment(self.date);
+  var reminders = self.activeReminders;
+  var reminderSenders = [];
+  reminders.forEach(function(reminder) {
+    if (reminder.validate() && reminder.isDue(rightNow)) {
+      reminderSenders.push(reminder.makeSender(self));
+    }
+  });
+  return exec.executeGroup(self, reminderSenders);
+}
 
-         if (lastDeliveredAt != 'Never') {
-            lastDeliveredAtHours = lastDeliveredAtDate.getHours();
-            lastDeliveredAtMinute = lastDeliveredAtDate.getMinutes();
-            lastDeliveredAtDay = lastDeliveredAtDate.getDate();
-            lastDeliveredAtMonth = lastDeliveredAtDate.getMonth();
-         }
+RefreshReminders.prototype = {
+  processReminders: function() {
+    var self = this;
+    return models.Reminder.findAll({
+      where: { expired: 0 }
+    })
+    .then(function(models) {
+      self.activeReminders = models.map(function(ele) {
+        return new Reminder(ele);
+      });
+      return RefreshReminders_sendMessagesDue(self);
+    })
+    .then(function() {
+      return self;
+    });
+  }
+};
 
-
-console.log('*_*_* getting in to updates repeat=' + repeat + 'lastDeliveredAt=' + lastDeliveredAt);      
-
-if (repeat == 'Yes') {
-    if (lastDeliveredAt != 'Never') {  
-        
-   console.log('This is a repeat reminder thats been sent before' + 'deliverhours:' + deliverAtHours + 'deliverAtMinute:' + deliverAtMinute + 'nowHours:' + nowHours + 'nowMinutes:' + nowMinutes + 'nowDate:' + nowDate + 'lastDeliveredAtDay:' + lastDeliveredAtDay);
-
-    if (deliverAtHours == nowHours && deliverAtMinute <= nowMinutes+15 && nowDate > lastDeliveredAtDay) { 
-      models.Reminders.update (
-                { 
-                        Repeat : 'Yes',
-                        lastDeliveredAt : actualDeliveryDate,
-                        
-                },
-                    { where: {id: id}}         
-                ).then(function(affectedRows){
-                    console.log('Updated repeat reminder' + affectedRows + ' rows');
-                }).catch(function (err){
-                console.log('could not update!');
-                res.status(500).send('Could not add the reminder, please contact admin ErroCode:' + err.parent.code);   
-               });
-               }     
-             }
-    else {
-console.log('This is a repeat reminder thats never been sent before' + 'deliverhours:' + deliverAtHours + 'deliverAtMinute:' + deliverAtMinute + 'nowHours' + nowHours + 'nowMinutes' + nowMinutes);
-        if (deliverAtHours == nowHours && deliverAtMinute <= nowMinutes+15) { 
-            models.Reminders.update (
-                        { 
-                            Repeat : 'Yes',
-                            lastDeliveredAt : actualDeliveryDate 
-                         },
-                        { where: {id: id}}         
-                    ).then(function(affectedRows){
-                        console.log('Updated repeat reminder' + affectedRows + ' rows');
-                    });
-                }    
-
-            } 
-        } else {
-        console.log('*_*_* This is a one time reminder check if time matches and send..');
-        console.log('*_*_* deliverAtHours:' + deliverAtHours + 'now hours:'+ nowHours);
-        console.log('*_*_* deliverAtMinute:' + deliverAtMinute + 'now minute:' + nowMinutes);
-        console.log('*_*_* deliverAtDate:' + deliverAtDate + 'now date:' + nowDate);
-        console.log('*_*_* deliverAtMonth:' + deliverAtMonth + 'now nowMonth:' + nowMonth);
-
-if (deliverAtHours == nowHours && deliverAtMinute == nowMinutes && deliverAtDate == nowDate && deliverAtMonth == nowMonth && expired != 'Yes') { 
-                              models.Reminders.update (
-                                     { 
-                                        Expired: 'Yes',
-                                        lastDeliveredAt : actualDeliveryDate
-                                      },
-                                    { where: {id: id}}         
-                                    ).then(function(affectedRows){
-                            console.log('Updated one time reminder' + affectedRows + ' rows');
-                         });
-
-                     } 
-
-                  }      
-
-
-            });
-  
-       }
-    });  
-
-
-    
+module.exports = RefreshReminders;

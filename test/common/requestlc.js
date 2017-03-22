@@ -130,6 +130,13 @@ function wipe() {
     expector.expectStatusCode(200);
     return makeRequest("DELETE", "/api/tickets").asRoot().go();
   })
+  .then(function(expector) {
+    expector.expectStatusCode(200);
+    return makeRequest("DELETE", "/api/reminders").asRoot().go();
+  })
+  .then(function(expector) {
+    expector.expectStatusCode(200);
+  });
 }
 
 module.exports = {

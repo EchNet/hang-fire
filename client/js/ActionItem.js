@@ -40,7 +40,7 @@ define([ "jquery", "Asset" ], function($, Asset) {
   function inviteNameAndEmail(invite) {
     var ele = hilite(invite.recipientName);
     if (invite.ticket && invite.ticket.email) {
-      ele = span().append(ele).append(span("<" + invite.ticket.email + ">"));
+      ele = span().append(ele).append(span(" <" + invite.ticket.email + ">"));
     }
     return ele;
   }
@@ -65,6 +65,8 @@ define([ "jquery", "Asset" ], function($, Asset) {
       return span("Invite someone to connect with you");
     case "inv-upd":
       return span("Update invitation for ").append(inviteNameAndEmail(data.invite));
+    case "rem-cre":
+      return span("Create a reminder");
     case "pro-cre":
       return span("Tell other users about you!");
     case "pro-upd":

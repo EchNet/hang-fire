@@ -124,12 +124,12 @@ function extHeaderLogin(self) {
         name: "Test",
         level: 1
       });
-      console.log("Assumed identity of user for testing:", effectiveUserId);
+      //console.log("Assumed identity of user for testing:", effectiveUserId);
     })
   }
   else {
     self.req.isAdmin = true;
-    console.log("Admin access for testing");
+    //console.log("Admin access for testing");
   }
 }
 

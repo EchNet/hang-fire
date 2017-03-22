@@ -1,11 +1,16 @@
 // ConnectionViewer.js - Component for recording and viewing messages to/from a connection.
 
-define([ "jquery", "Activity", "ui/index", "ActionItem", "Services", "VideoRecorder" ],
-function($,        Activity,     ui,       ActionItem,   Services,   VideoRecorder ) {
+define([ "jquery", "Activity", "ui/index", "ActionItem", "Services", "VideoRecorder", "util/When" ],
+function($,        Activity,     ui,       ActionItem,   Services,   VideoRecorder, When ) {
 
   return Activity.defineClass(function(c) {
 
     function addControls(self) {
+
+      function messageDescription(message) {
+        return (message.fromUserId == self.actionItem.user.id ? self.actionItem.user.name : "you")
+          + " at " + When.formatRelativeTime(Date.parse(message.createdAt));
+      }
 
       function addThumb(self, url, onClick) {
         new ui.Image("<div class='thumb'>").setSrc(url).addPlugin({
@@ -18,9 +23,10 @@ function($,        Activity,     ui,       ActionItem,   Services,   VideoRecord
           var message = self.actionItem.thread[index];
           autoplay = autoplay || message.fromUserId == self.actionItem.user.id;
           self.videoPlayer.load(message.asset.url, { autoplay: autoplay });
+          self.videoDesc.text = messageDescription(message);
+          self.playerView.visible = true;
         }
         self.videoRecorder.close();
-        self.playerView.visible = true;
         self.videoRecorder.visible = false;
       }
 
@@ -50,10 +56,12 @@ function($,        Activity,     ui,       ActionItem,   Services,   VideoRecord
       var self = this;
       self.videoPlayer = new ui.Video(); 
       self.buttonPanel = new ui.Component("<div style='float: left; width: 100px'>");
-      self.videoRecorder = new VideoRecorder().addPlugin(self).setVisible(false);
+      self.videoDesc = new ui.Component("<div class='subtle'>");
       self.playerView = new ui.Component("<div class='panel'>").setVisible(false);
+      self.videoRecorder = new VideoRecorder().addPlugin(self).setVisible(false);
 
       self.playerView.ele
+        .append(self.videoDesc.ele)
         .append(self.buttonPanel.ele)
         .append(self.videoPlayer.ele.css({ "margin": "auto" }))
 

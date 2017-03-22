@@ -18,7 +18,7 @@ function($,        Services,   Login,   Listing,   ActivityStarter,   WaitAnim, 
     c.defineInitializer(function() {
       var self = this;
 
-      var titleLabel = new ui.Component("<span>", { cssClass: "title" }).setText("Living Connections");
+      var titleLabel = new ui.Component("<span>", { cssClass: "title" }).setText("LIVING CONNECTIONS");
       var userNameLabel = new ui.Component("<span>", { cssClass: "userName" });
       var emailLabel = new ui.Component("<span>", { cssClass: "hilite" });
       var logoutLink = new ui.Component("<a>", { cssClass: "logout" }).setText("Log out").addPlugin({

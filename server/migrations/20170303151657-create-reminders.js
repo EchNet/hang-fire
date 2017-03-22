@@ -15,21 +15,21 @@ module.exports = {
         allowNull: false,
         type: Sequelize.STRING
       },
-      Repeat: {
-        allowNull: false,
+      repeat: {
+        defaultValue: 0,
         type: Sequelize.INTEGER
       },
-      Expired: {
-        allowNull: false,
-        type: Sequelize.STRING
+      expired: {
+        defaultValue: 0,
+        type: Sequelize.INTEGER
       },
       deliverAt: {
         allowNull: false,
         type: Sequelize.STRING
       },
       lastDeliveredAt: {
-        allowNull: false,
-        type: Sequelize.STRING
+        allowNull: true,
+        type: Sequelize.DATE
       },
       fromUserId: {
         allowNull: false,

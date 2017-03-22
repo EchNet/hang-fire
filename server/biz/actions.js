@@ -152,12 +152,17 @@ function addAnnouncementItems(compiler) {
   }
 }
 
+function addReminderItems(compiler) {
+  addActionItem(compiler, TOPIC_REMINDER, ACTION_CREATE);
+}
+
 function createActionItems(compiler) {
   addProfileItems(compiler);
   if (compiler.user.name) {
     addConnectionItems(compiler);
     addInvitationItems(compiler);
     addAnnouncementItems(compiler);
+    addReminderItems(compiler);
   }
 }
 

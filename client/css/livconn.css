@@ -343,3 +343,8 @@ span.hilite {
 .thumb img:hover {
   border: solid 2px orange;
 }
+.subtle {
+  font-style: italic;
+  font-size: 12px;
+}
+}

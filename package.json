@@ -20,13 +20,14 @@
     "sequelize": "3.30.2",
     "sequelize-cli": "2.5.1",
     "tmp": "0.0.31",
-    "moment-timezone": "^0.5.11",  
+    "moment-timezone": "^0.5.11",
     "winston": "2.3.1"
   },
   "devDependencies": {
     "chai": "3.5.0",
     "grunt-blanket-mocha": "0.4.1",
-    "mocha": "2.5.3"
+    "mocha": "2.5.3",
+    "timekeeper": "^1.0.0"
   },
   "engines": {
     "node": "5.2.0"

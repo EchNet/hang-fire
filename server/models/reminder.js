@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = function(sequelize, DataTypes) {
-  var Reminders;
+  var Reminder;
   var models;
 
   function schema() {
@@ -10,57 +10,52 @@ module.exports = function(sequelize, DataTypes) {
         type: DataTypes.INTEGER,
         allowNull: false   
       },
-     toUserId: {
+      toUserId: {
         type: DataTypes.INTEGER,
-        allowNull: false, 
+        allowNull: false 
       },    
-      status: DataTypes.INTEGER,
-     assetId: {
+      assetId: {
         type: DataTypes.INTEGER,
         allowNull: false  
       },     
-     status: {
-        type: DataTypes.STRING,
-        defaultValue: 0 
-      },    
-      createdAt: DataTypes.DATE,
-      updatedAt: DataTypes.DATE,
       deliverAt: { 
         type : DataTypes.STRING,
+        allowNull: false  
       },
-      Repeat: { 
-        type : DataTypes.INTEGER,
-        allowNull: false   
+      repeat: { 
+        type : DataTypes.INTEGER
       }, 
-      Expired: { 
-        type : DataTypes.STRING,
+      expired: { 
+        type : DataTypes.INTEGER
       },  
       lastDeliveredAt: { 
-        type : DataTypes.STRING,
+        type : DataTypes.DATE,
       },    
       timeZone: {
         type: DataTypes.STRING  
-      }    
+      },    
+      createdAt: {
+        type: DataTypes.DATE
+      },
+      updatedAt: {
+        type: DataTypes.DATE
+      }
     } 
   }
 
   function associate(_models) {
     models = _models;
-    Reminders.belongsTo(models.User, { as: "fromUser" });
-    Reminders.belongsTo(models.User, { as: "toUser" });  
-    Reminders.belongsTo(models.Asset, {as: "asset"});  
+    Reminder.belongsTo(models.User, { as: "fromUser" });
+    Reminder.belongsTo(models.User, { as: "toUser" });  
+    Reminder.belongsTo(models.Asset, {as: "asset"});  
   }
-
-   
-  
 
   function destroyAll() {
-    return Reminders.destroy({ where: {} });
+    return Reminder.destroy({ where: {} });
   }
 
-
   function findByFromUserId(userId) {
-    return Reminders.findAll({
+    return Reminder.findAll({
       where: { fromUserId: userId },
       include: [{
         model: models.Users,
@@ -81,7 +76,7 @@ module.exports = function(sequelize, DataTypes) {
   }
 
   function findByToUserId(userId) {
-    return Reminders.findAll({
+    return Reminder.findAll({
       where: { toUserId: userId },
       include: [{
         model: models.Users,
@@ -101,9 +96,8 @@ module.exports = function(sequelize, DataTypes) {
     })
   }
     
-
   function findByFromUserAndToUserIds(fromUserId, toUserId) {
-    return Reminders.findOne({
+    return Reminder.findOne({
       where: {
         fromUserId: fromUserId,
         toUserId: toUserId
@@ -120,15 +114,15 @@ module.exports = function(sequelize, DataTypes) {
     })
   }
  
- function destroyWhere(where) {
-    return Reminders.destroy({ where: where });
+  function destroyWhere(where) {
+    return Reminder.destroy({ where: where });
   }    
    
-function destroyById(id) {
+  function destroyById(id) {
     return destroyWhere({ id: id });
   }    
 
-  Reminders = sequelize.define("Reminders", schema(), {
+  Reminder = sequelize.define("Reminder", schema(), {
     classMethods: {
       associate: associate,
       destroyAll: destroyAll,
@@ -139,5 +133,5 @@ function destroyById(id) {
     }     
   })
 
-  return Reminders;
+  return Reminder;
 };

@@ -1,6 +1,6 @@
 // api.js - ApiService
 
-define([ "http" ], function(HttpMethod) {
+define([ "util/HttpMethod" ], function(HttpMethod) {
 
   function makePostAnnouncement() {
     var PostAnnouncementMethod = new HttpMethod.PostForm()
