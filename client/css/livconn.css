@@ -261,20 +261,27 @@ div.video .overlay {
 	transition: opacity .3s;
 }
 div.video .controls {
-  padding: 0 40px;
+  padding: 2px 40px;
   position: relative;
 }
 div.video button {
   width: 30px;
   height: 30px;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: 4px 4px;
+  cursor: pointer;
+  background-size: 18px 18px;
 }
 div.video button.restart {
   position: absolute;
   left: 0px;
+  background-image: url(/img/restartbutton.png);
 }
 div.video button.fullScreen {
   position: absolute;
   right: 0px;
+  background-image: url(/img/fullscreenbutton.png);
 }
 div.video progress {
   height: 30px;
