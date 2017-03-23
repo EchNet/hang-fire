@@ -343,9 +343,12 @@ span.hilite {
   color: #288;
 }
 .thumb img {
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   border: solid 2px white;
+}
+.thumb.selected img {
+  border: solid 2px orange;
 }
 .thumb img:hover {
   border: solid 2px orange;
@@ -353,5 +356,4 @@ span.hilite {
 .subtle {
   font-style: italic;
   font-size: 12px;
-}
 }

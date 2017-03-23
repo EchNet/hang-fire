@@ -19,12 +19,14 @@ function($,        Activity,     ui,       ActionItem,   Services,   VideoRecord
       }
 
       function toPlayState(index, autoplay) {
+        self.ele.find(".thumb.selected").removeClass("selected");
         if (self.actionItem.thread && self.actionItem.thread.length > index) {
           var message = self.actionItem.thread[index];
           autoplay = autoplay || message.fromUserId == self.actionItem.user.id;
           self.videoPlayer.load(message.asset.url, { autoplay: autoplay });
           self.videoDesc.text = messageDescription(message);
           self.playerView.visible = true;
+          self.ele.find(".thumb:eq(" + (index + 1) + ")").addClass("selected");
         }
         self.videoRecorder.close();
         self.videoRecorder.visible = false;
@@ -55,7 +57,7 @@ function($,        Activity,     ui,       ActionItem,   Services,   VideoRecord
     c.defineInitializer(function() {
       var self = this;
       self.videoPlayer = new ui.Video(); 
-      self.buttonPanel = new ui.Component("<div style='float: left; width: 100px'>");
+      self.buttonPanel = new ui.Component("<div style='float: left;'>");
       self.videoDesc = new ui.Component("<div class='subtle'>");
       self.playerView = new ui.Component("<div class='panel'>").setVisible(false);
       self.videoRecorder = new VideoRecorder().addPlugin(self).setVisible(false);
