@@ -6,7 +6,7 @@ function($,        Activity,   VideoRecorder,   ui) {
   var ScheduleEditor = ui.Component.defineClass(function(c) {
 
     function makeErrorLabel(text) {
-      return new ui.Component("<span>", { cssClass: "error" }).setText(text).setVisible(false);
+      return new ui.Component({ html: "<span>", cssClass: "error" }).setText(text).setVisible(false);
     }
 
     c.defineProperty("deliverAt", {
@@ -30,7 +30,7 @@ function($,        Activity,   VideoRecorder,   ui) {
     c.defineInitializer(function() {
       var self = this;
 
-      self.deliverAtSelector = new ui.DropDown("<select>", {
+      self.deliverAtSelector = new ui.DropDown({
         options: [
           //{ label: "do", value: 0 }, { label: "re", value: 1 }, { label: "mi", value: 2 }
         ]

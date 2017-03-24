@@ -4,9 +4,8 @@ define([ "jquery", "ui/component", ], function($, Component) {
 
   return Component.defineClass(function(c) {
 
-    c.defineDefaultContainer("<span>");
-
     c.defineDefaultOptions({
+      html: "<span>",
       invalidCssClass: "invalid"
     });
 

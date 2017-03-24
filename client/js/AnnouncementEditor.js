@@ -8,7 +8,7 @@ function($,        Activity,     VideoRecorder,   ui) {
     c.defineInitializer(function() {
       var self = this;
 
-      var typeSelector = new ui.RadioGroup($("<div>"), {
+      var typeSelector = new ui.RadioGroup({
         groupName: "annType",
         choices: [
           { value: 3, label: "To all users" },
@@ -16,12 +16,12 @@ function($,        Activity,     VideoRecorder,   ui) {
         ]
       });
 
-      var startDatePicker = new ui.DateTimeInput($("<span>"));
+      var startDatePicker = new ui.DateTimeInput("<span>");
       startDatePicker.addChangeListener(function(value) {
         self.data.startDate = value;
       });
 
-      var endDatePicker = new ui.DateTimeInput($("<span>"));
+      var endDatePicker = new ui.DateTimeInput("<span>");
       endDatePicker.addChangeListener(function(value) {
         self.data.endDate = value;
       });

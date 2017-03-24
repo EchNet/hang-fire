@@ -4,7 +4,9 @@ define([ "ui/component" ], function(Component) {
 
   var Button = Component.defineClass(function(c) { 
 
-    c.defineDefaultContainer("<button>");
+    c.defineDefaultOptions({
+      html: "<button>"
+    });
 
     c.defineInitializer(function() {
       var self = this;

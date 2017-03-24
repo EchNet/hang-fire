@@ -18,10 +18,10 @@ function($,        Services,   Login,   Listing,   ActivityStarter,   WaitAnim, 
     c.defineInitializer(function() {
       var self = this;
 
-      var titleLabel = new ui.Component("<span>", { cssClass: "title" }).setText("LIVING CONNECTIONS");
-      var userNameLabel = new ui.Component("<span>", { cssClass: "userName" });
-      var emailLabel = new ui.Component("<span>", { cssClass: "hilite" });
-      var logoutLink = new ui.Component("<a>", { cssClass: "logout" }).setText("Log out").addPlugin({
+      var titleLabel = new ui.Component({ html: "<span>", cssClass: "title" }).setText("LIVING CONNECTIONS");
+      var userNameLabel = new ui.Component({ html: "<span>", cssClass: "userName" });
+      var emailLabel = new ui.Component({ html: "<span>", cssClass: "hilite" });
+      var logoutLink = new ui.Component({ html: "<a>", cssClass: "logout" }).setText("Log out").addPlugin({
         onClick: function() {
           sessionManager.logOut();
         }
@@ -139,18 +139,19 @@ function($,        Services,   Login,   Listing,   ActivityStarter,   WaitAnim, 
     var LOGIN_VIEW = "login";
     var MAIN_VIEW = "main";
 
-    var carton = new ui.Carton($("#content"), {
+    var carton = new ui.Carton({
+      selector: "#content",
       noAppend: true,
       goalType: ui.FadeGoal,
       initialState: STARTUP_VIEW
     })
 
-    carton.addCompartment(STARTUP_VIEW, new ui.Component($("#startup")));
-    carton.addCompartment(LOGIN_VIEW, new Login($("#login")));
-    carton.addCompartment(MAIN_VIEW, new MainView($("#app")));
+    carton.addCompartment(STARTUP_VIEW, new ui.Component("#startup"));
+    carton.addCompartment(LOGIN_VIEW, new Login("#login"));
+    carton.addCompartment(MAIN_VIEW, new MainView("#app"));
 
     var under = $("#startup .under");
-    var waitAnim = new WaitAnim($("<div>"), { ndots: 10 });
+    var waitAnim = new WaitAnim({ ndots: 10 });
     under.after(waitAnim.ele);
 
     function show(state, msg) {

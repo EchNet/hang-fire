@@ -14,9 +14,9 @@ function($,        Services,   ui,         FacebookButton) {
 
     c.defineInitializer(function() {
       var self = this;
-      var userImage = new ui.Image($("<div>"));
-      var nameLabel = new ui.Component($("<span>"));
-      var emailLabel = new ui.Component($("<span>"));
+      var userImage = new ui.Image();
+      var nameLabel = new ui.Component("<span>");
+      var emailLabel = new ui.Component("<span>");
       var loginButton = ui.Button.create("That's me!", function() {
         loginButton.enabled = false;
         Services.sessionManager.logInWithFacebook(fbService.value)

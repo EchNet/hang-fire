@@ -13,7 +13,7 @@ function($,        ui,         Services) {
 
     c.defineInitializer(function() {
       var self = this;
-      self.titleLabel = new ui.Component("<div>", { cssClass: "title" });
+      self.titleLabel = new ui.Component({ cssClass: "title" });
       self.actionItem = self.options.actionItem;
       var exitButton = ui.Button.create(self.options.exitLinkText, function() {
         self.exit();

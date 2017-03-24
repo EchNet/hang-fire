@@ -9,7 +9,7 @@ define([ "jquery", "ui/component", "ui/observable" ], function($, Component, Obs
       var self = this;
       self.state = new Observable(0);
       // jQuery is unable to handle creation of audio elements?
-      self.container.html("<audio></audio>");
+      self.ele.html("<audio></audio>");
     });
 
     c.defineProperty("audioElement", {

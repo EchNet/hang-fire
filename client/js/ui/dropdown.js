@@ -4,7 +4,7 @@ define([ "jquery", "ui/component" ], function($, Component) {
 
   return Component.defineClass(function(c) { 
 
-    c.defineDefaultContainer("<select>");
+    c.defineDefaultOptions({ html: "<select>" });
 
     c.defineInitializer(function() {
       var self = this;

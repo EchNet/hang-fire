@@ -68,7 +68,7 @@ function($,        Services,   Activity,     ui,         WaitAnim) {
       }
 
       function createUpdateButton() {
-        return new ui.Button("<button>", { cssClass: "default" }).addPlugin({
+        return new ui.Button({ cssClass: "default" }).addPlugin({
           onClick: function() {
             self.nameInput.submit();
           }

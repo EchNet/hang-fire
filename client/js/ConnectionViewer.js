@@ -13,9 +13,9 @@ function($,        Activity,     ui,       ActionItem,   Services,   VideoRecord
       }
 
       function addThumb(self, url, onClick) {
-        new ui.Image("<div class='thumb'>").setSrc(url).addPlugin({
+        self.buttonPanel.append(new ui.Image({ cssClass: "thumb" }).setSrc(url).addPlugin({
           onClick: onClick
-        }).ele.appendTo(self.buttonPanel.ele);
+        }));
       }
 
       function toPlayState(index, autoplay) {
