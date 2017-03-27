@@ -225,6 +225,26 @@ div {
 .vidrec {
   position: relative;
 }
+div.messageOptions {
+  padding-bottom: 4px;
+  border-bottom: dashed 1px #ddd;
+  text-align: right;
+}
+div.messageOptions button.plus {
+  background-image: url(/img/plus.png);
+  width: 28px;
+  height: 28px;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: 4px 4px;
+  cursor: pointer;
+  background-size: 18px 18px;
+  border: none;
+}
+div.messageView {
+  padding-bottom: 4px;
+  border-bottom: dashed 1px #ddd;
+}
 div.videoPlayer {
   margin: auto;
   position: relative;
@@ -301,7 +321,7 @@ video {
 #app button {
   background-color: white;
   color: #004;
-  border: solid 2px #004;
+  border: solid 1px #888;
   border-radius: 8px;
   font-size: 18px;
   font-weight: bold;

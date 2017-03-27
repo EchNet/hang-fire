@@ -32,7 +32,17 @@ function($,        Activity,     ui,       ActionItem,   Services,   VideoRecord
         return self;
       }
 
-      self.playerView.append(ui.Button.create(wouldBeReply ? "Reply" : ("Send " + (thread.length ? "another" : "a") + " videogram"), toReplyState));
+      function makeMessageOptions() {
+        var labelText = wouldBeReply ? "Reply" : ("Send " + (thread.length ? "another" : "a") + " videogram ");
+        var label = new ui.Component("<span>").setText(labelText);
+        var button = new ui.Button({ cssClass: "plus" });
+        return new ui.Component({ cssClass: "messageOptions" })
+          .append(label)
+          .append(button)
+          .addPlugin({ onClick: toReplyState });
+      }
+
+      self.playerView.append(makeMessageOptions());
 
       for (var i = 0; i < thread.length; ++i) {
         (function(i) {
@@ -41,7 +51,7 @@ function($,        Activity,     ui,       ActionItem,   Services,   VideoRecord
             minimize: i != 0,
             user: user,
             message: message,
-            cssClass: "thumb"
+            cssClass: "messageView"
           }).addPlugin({
             requestMaximize: function() {
               requestMaximize(i);
