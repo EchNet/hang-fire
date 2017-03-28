@@ -251,6 +251,9 @@ div.videoPlayer {
 }
 div.video {
   position: relative;
+  margin-left: auto;
+  margin-right: auto;
+  display: block
 }
 div.video .counter {
   position: absolute;
