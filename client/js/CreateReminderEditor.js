@@ -36,18 +36,22 @@ function($,        Activity,   VideoRecorder,   ui) {
         ]
       });
 
-      self.okButton = ui.Button.create("Record a message", function() {
-        self.invokePlugin("openVideoRecorder");
+      self.okButton = ui.Button.create("OK", function() {
+        self.invokePlugin("exit");
       });
+
+      //self.okButton = ui.Button.create("Record a message", function() {
+        //self.invokePlugin("openVideoRecorder");
+      //});
 
       self.ele
         .append($("<div>").addClass("panel")
           .append($("<div>")
-            .text("Schedule a message to be delivered."))
-          .append($("<div>")
-            .append(self.deliverAtSelector.ele))
-          .append($("<div class='subtle'>")
-            .text("(put editor components here)"))
+            .text("This feature is not yet ready for test!"))
+          //.append($("<div>")
+            //.append(self.deliverAtSelector.ele))
+          //.append($("<div class='subtle'>")
+            //.text("(put editor components here)"))
           .append($("<div>")
             .append(self.okButton.ele))
         )
