@@ -19,7 +19,7 @@ function($,        Activity,     ui,       ActionItem,   Services,   VideoRecord
 
       function toReplyState() {
         var userName = self.actionItem.user.name || "your connection";
-        self.title = $("<span>").text(wouldBeReply ? "Reply to" : "Send videogram to ").append($("<span class='hilite'>").text(userName));
+        self.title = $("<span>").text(wouldBeReply ? "Reply to " : "Send videogram to ").append($("<span class='hilite'>").text(userName));
         self.playerView.visible = false;
         self.videoRecorder.visible = true;
         self.videoRecorder.open();
