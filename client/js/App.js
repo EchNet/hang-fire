@@ -35,14 +35,15 @@ function($,        Services,   Login,   Listing,   ActivityStarter,   WaitAnim, 
           .append(userNameLabel.ele)
           .append($("<span>").text(" "))
           .append(emailLabel.ele)
-          .append($("<span>").text(" "))
-          .append(logoutLink.ele));
+          //.append($("<span>").text(" "))
+          //.append(logoutLink.ele)
+        );
 
       function update() {
         var user = sessionManager.user || {}
         userNameLabel.setText(user.name || "");
         emailLabel.setText(user.email && user.email != user.name ? user.email : "");
-        logoutLink.setEnabled(!!sessionManager.user);
+        //logoutLink.setEnabled(!!sessionManager.user);
       }
 
       sessionManager.addStateChangeListener(update);

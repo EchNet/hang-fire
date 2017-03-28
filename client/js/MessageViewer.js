@@ -45,11 +45,6 @@ function($,        Activity,     ui,       ActionItem,   Services) {
         var asset = actionItem.message ? actionItem.message.asset : actionItem.user.asset;
         self.videoPlayer.load(asset.url, { autoplay: true });
 
-        var sender = actionItem.user || actionItem.message.fromUser;
-        if (sender) {
-          addSenderButtons(self, sender);
-        }
-
         return self;
       }
     });

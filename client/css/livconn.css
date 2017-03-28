@@ -173,14 +173,13 @@ div {
 }
 #app .listing .item {
   border-radius: 6px;
-  margin-bottom: 6px;
+  margin: 0px 6px 6px 0px;
   padding: 8px 12px;
   background-color: white;
   color: #004;
   box-shadow: 2px 2px 2px 2px rgba(0,0,0,0.2);
-}
-#app .listing .item.new {
-  background-color: yellow;
+  width: 440px;
+  display: inline-block;
 }
 #app .listing .item:hover {
   background-color: #fff8e8;
@@ -189,9 +188,16 @@ div {
   float: right;
   font-size: 20px;
 }
+#app .listing .item .subtitle {
+  margin-top: 5px;
+  clear: right;
+  float: right;
+  font-size: 14px;
+  font-style: italic;
+}
 #app img.bigIcon {
-  width: 48px;
-  height: 48px;
+  width: 64px;
+  height: 64px;
 }
 #app .activity {
   background-color: white;

@@ -13,6 +13,9 @@ define([ "jquery", "ui/index", "services" ], function($, ui, Services) {
         .append($("<div>")
           .addClass("title")
           .append(actionItem.title))
+        .append($("<div>")
+          .addClass("subtitle")
+          .append(actionItem.subtitle))
         .click(function() {
           if (self.isOpen) {
             self.invokePlugin("openActionItem", actionItem);
