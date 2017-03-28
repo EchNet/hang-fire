@@ -285,6 +285,7 @@ div.video .overlay {
 	-o-transition: opacity .3s;
 	-ms-transition: opacity .3s;
 	transition: opacity .3s;
+  cursor: pointer;
 }
 div.video .controls {
   padding: 2px 40px;
@@ -316,6 +317,7 @@ div.video progress {
 video {
   object-fit: contain;
   object-position: 50% 50%;
+  cursor: pointer;
 }
 #app .activity .panel {
   border-top: dashed 1px #96a090;

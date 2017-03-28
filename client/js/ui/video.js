@@ -64,11 +64,11 @@ define([ "jquery", "ui/button", "ui/component", "ui/sizegoal" ], function($, But
       self.playOverlay = new Component("<div class='overlay'>").addPlugin({
         onClick: playOrPause
       });
-      self.restartButton = new Button("<button>", { cssClass: "restart" }).addPlugin({
+      self.restartButton = new Button({ cssClass: "restart" }).addPlugin({
         onClick: restart
       });
       self.progressBar = new Component("<progress min='0' max='100' value='0'>");
-      self.fullScreenButton = new Button("<button>", { cssClass: "fullScreen" }).addPlugin({
+      self.fullScreenButton = new Button({ cssClass: "fullScreen" }).addPlugin({
         onClick: fullScreen
       });
 
