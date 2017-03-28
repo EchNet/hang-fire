@@ -56,7 +56,7 @@ function($,        Activity,     ui,       ActionItem,   Services) {
 
     c.defineProperty("invite", {
       "get": function() {
-        return this.options.actionItem.invite;
+        return this.actionItem.invite;
       }
     });
 
