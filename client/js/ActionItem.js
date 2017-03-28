@@ -48,29 +48,27 @@ define([ "jquery", "Asset" ], function($, Asset) {
   function titleFunc(topic, aspect, data) {
     switch (topic + "-" + aspect) {
     case "ann-rec":
-      return span("Announcement from ").append(userName(data, [ "message", "fromUser" ]));
+      return span("Announcements");
     case "ann-cre":
       return span("Make an announcement");
     case "ann-upd":
       return span("Update announcement");
     case "con-new":
-      return span("Start a conversation with ").append(userName(data, [ "user" ]));
     case "con-in":
-      return span("See videogram from ").append(userName(data, [ "user" ]));
     case "con-out":
-      return span("Stay in touch with ").append(userName(data, [ "user" ]));
+      return userName(data, [ "user" ];
     case "inv-rec":
-      return span("Invitation from ").append(userName(data, [ "invite", "fromUser" ]));
+      return span("You have an invitation from ").append(userName(data, [ "invite", "fromUser" ]));
     case "inv-cre":
-      return span("Invite someone to connect with you");
+      return span("Invite someone to Living Connections");
     case "inv-upd":
       return span("Update invitation for ").append(inviteNameAndEmail(data.invite));
     case "rem-cre":
-      return span("Create a reminder");
+      return span("Create a reminder - NOT YET FUNCTIONAL");
     case "pro-cre":
-      return span("Tell other users about you!");
+      return span("Record your profile video");
     case "pro-upd":
-      return span('Update your "about you" message');
+      return span("Update your profile video");
     case "usr-cre":
       return span("Start by picking your user name");
     case "usr-upd":
