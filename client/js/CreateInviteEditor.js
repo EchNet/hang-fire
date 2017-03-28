@@ -6,7 +6,7 @@ function($,        Activity,     VideoRecorder,   ui) {
   var NameAndEmailEditor = ui.Carton.defineClass(function(c) {
 
     function makeErrorLabel(text) {
-      return new ui.Component("<span>", { cssClass: "error" }).setText(text).setVisible(false);
+      return new ui.Component({ html: "<span>", cssClass: "error" }).setText(text).setVisible(false);
     }
 
     c.defineProperty("email", {

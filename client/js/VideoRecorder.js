@@ -77,33 +77,32 @@ function($,        Services,   ui,         WaitAnim) {
       });
       declareDefaultButtonForState(STATE_ERROR, retryButton);
 
-      self.addCompartment(STATE_WAITING, new WaitAnim($("<div>"), {
-      }));
-      self.addCompartment(STATE_READY, new ui.Component($("<div>")
-        .append(startButton.ele)
-        .append($("<span>").text(" to start recording your " + what + "."))
-      ));
-      self.addCompartment(STATE_RECORDING, new ui.Component($("<div>")
-        .append($("<span>").text("Recording... "))
-        .append(stopButton.ele)
-      ));
-      self.addCompartment(STATE_REVIEW, new ui.Component($("<div>")
-        .append($("<span>").text("Please review your " + what + "... "))
-        .append(acceptButton.ele)
-        .append(rejectButton.ele)
-      ));
-      self.addCompartment(STATE_PREVIEW, new ui.Component($("<div>")
-        .append($("<span>").text("Here is your previously recorded " + what + "... "))
-        .append(redoButton.ele)
-      ));
-      self.addCompartment(STATE_ERROR, new ui.Component($("<div>")
-        .append($("<span>").text("Oh no, something went wrong! "))
-        .append(retryButton.ele)
-      ));
-      self.addCompartment(STATE_DONE, new ui.Component($("<div>")
-        .append($("<span>").text(capitalize(what) + " sent! "))
-        .append(closeButton.ele)
-      ));
+      self.addCompartment(STATE_WAITING, new WaitAnim());
+      self.addCompartment(STATE_READY, new ui.Component()
+        .append(startButton)
+        .append(new ui.Component("<span>").setText(" to start recording your " + what + "."))
+      );
+      self.addCompartment(STATE_RECORDING, new ui.Component()
+        .append(new ui.Component("<span>").setText("Recording... "))
+        .append(stopButton)
+      );
+      self.addCompartment(STATE_REVIEW, new ui.Component()
+        .append(new ui.Component("<span>").setText("Please review your " + what + "... "))
+        .append(acceptButton)
+        .append(rejectButton)
+      );
+      self.addCompartment(STATE_PREVIEW, new ui.Component()
+        .append(new ui.Component("<span>").setText("Here is your previously recorded " + what + "... "))
+        .append(redoButton)
+      );
+      self.addCompartment(STATE_ERROR, new ui.Component()
+        .append(new ui.Component("<span>").setText("Oh no, something went wrong! "))
+        .append(retryButton)
+      );
+      self.addCompartment(STATE_DONE, new ui.Component()
+        .append(new ui.Component("<span>").setText(capitalize(what) + " sent! "))
+        .append(closeButton)
+      );
     });
   });
 
@@ -258,13 +257,13 @@ function($,        Services,   ui,         WaitAnim) {
     c.defineInitializer(function() {
       var self = this;
       var controller = createController(self);
-      var controlPanel = new ControlPanel($("<div>"), $.extend({}, self.options, {
+      var controlPanel = new ControlPanel($.extend({}, self.options, {
         cssClasses: [ "controlPanel", "panel" ]
       }))
         .addPlugin(controller)
         .addPlugin(self);
       var videoComponent = new ui.Video();
-      var counter = new ui.Component($("<span>").addClass("counter"));
+      var counter = new ui.Component({ html: "<span>", cssClass: "counter" });
 
       self.ele
         .append(controlPanel.ele)

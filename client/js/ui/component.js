@@ -16,14 +16,34 @@ define([ "jquery", "ui/observable" ], function($, Observable) {
     }
   }
 
-  function Component(ele, options) {
+  function Component() {
     var self = this;
     var proto = Object.getPrototypeOf(self);
-    ele = ele || proto.DEFAULT_CONTAINER;
+    var defaultOptions = proto.DEFAULT_OPTIONS;
+
+    var ele, options = {};
+    switch (arguments.length) {
+    case 0:
+      break;
+    case 1:
+      if (typeof arguments[0] === "string") {
+        ele = arguments[0];
+      }
+      else {
+        options = arguments[0];
+      }
+      break;
+    default:
+      ele = arguments[0];
+      options = arguments[1];
+    }
+
+    options = $.extend({}, defaultOptions, options);
+
+    ele = ele || options.selector || options.html;
     if (typeof ele === "string") {
       ele = $(ele);
     }
-    options = $.extend({}, proto.DEFAULT_OPTIONS, options);
 
     Observable.call(self);
     self._ele = ele;
@@ -41,8 +61,12 @@ define([ "jquery", "ui/observable" ], function($, Observable) {
   }
 
   Component.prototype = $.extend(Object.create(Observable.prototype), {
-    DEFAULT_CONTAINER: "<div>",
-    DEFAULT_OPTIONS: {},
+    DEFAULT_OPTIONS: { html: "<div>" },
+
+    append: function(child) {
+      this.ele.append(child.ele);
+      return this;
+    },
 
     addPlugin: function(plugin) {
       var plugins = this._plugins;
@@ -168,9 +192,6 @@ define([ "jquery", "ui/observable" ], function($, Observable) {
     definer({
       defineInitializer: function(_initializer) {
         initializer = _initializer;
-      },
-      defineDefaultContainer: function(defaultContainer) {
-        proto.DEFAULT_CONTAINER = defaultContainer;
       },
       defineDefaultOptions: function(defaultOptions) {
         proto.DEFAULT_OPTIONS = $.extend({}, proto.DEFAULT_OPTIONS, defaultOptions);

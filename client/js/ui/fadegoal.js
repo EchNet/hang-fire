@@ -5,7 +5,7 @@ define([ "jquery" ], function($) {
   var DEFAULTS = {
     tick: 20,
     quantum: 10,
-    decay: 0.9985,
+    decay: 0.9975,
     epsilon: 0.01
   };
 

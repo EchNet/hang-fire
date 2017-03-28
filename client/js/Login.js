@@ -91,14 +91,14 @@ function($,        ui,         FacebookButton, WaitAnim,   Services) {
 
     c.defineInitializer(function() {
       var self = this;
-      var userImage = new ui.Image($("<div>"));
-      var nameLabel = new ui.Component($("<span>"));
-      var emailLabel = new ui.Component($("<span>"));
+      var userImage = new ui.Image();
+      var nameLabel = new ui.Component("<span>");
+      var emailLabel = new ui.Component("<span>");
       var loginButton = ui.Button.create("That's correct - log in", function() {
         loginButton.enabled = false;
         Services.sessionManager.logInWithFacebook(fbService.value);
       });
-      var fbButton = new FacebookButton($("<span>"));
+      var fbButton = new FacebookButton("<span>");
 
       self.ele
         .addClass("fbInfo")
@@ -149,7 +149,7 @@ function($,        ui,         FacebookButton, WaitAnim,   Services) {
         .addCompartment(WAITING, new WaitAnim($("<div>"), { ndots: 8 }))
         .addCompartment(INFO, new FacebookInfo())
         .addCompartment(UNKNOWN, new FacebookLogin())
-        .addCompartment(TIMEOUT, new ui.Component($("<div>"), { cssClasses: [ "message", "chunk" ] })
+        .addCompartment(TIMEOUT, new ui.Component({ cssClasses: [ "message", "chunk" ] })
           .setText("Sorry, we can't connect to Facebook now"))
         .addState(fbService.CONNECTED, [ INFO, FBLOGIN ]);
       self.ele
@@ -182,8 +182,9 @@ function($,        ui,         FacebookButton, WaitAnim,   Services) {
 
     c.defineInitializer(function() {
       var self = this;
-      var carton = new ui.Carton($("<div>").addClass("body"), {
-          initialState: EMAIL
+      var carton = new ui.Carton({
+        cssClass: "body",
+        initialState: EMAIL
       }).addCompartment(EMAIL, new EmailForm().addPlugin(self))
         .addCompartment(FB, new FacebookForm().addPlugin(self));
       self.ele
