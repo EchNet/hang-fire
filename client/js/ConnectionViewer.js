@@ -33,8 +33,8 @@ function($,        Activity,     ui,       ActionItem,   Services,   VideoRecord
       }
 
       function makeMessageOptions() {
-        var labelText = wouldBeReply ? "Reply" : ("Send " + (thread.length ? "another" : "a") + " videogram ");
-        var label = new ui.Component("<span>").setText(labelText);
+        var labelText = wouldBeReply ? "Reply" : ("Send " + (thread.length ? "another" : "a") + " videogram");
+        var label = new ui.Component("<span>").setText(labelText + " ");
         var button = new ui.Button({ cssClass: "plus" });
         return new ui.Component({ cssClass: "messageOptions" })
           .append(label)
