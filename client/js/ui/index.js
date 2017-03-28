@@ -14,6 +14,7 @@
     "Image",
     "Observable",
     "RadioGroup",
+    "SizeGoal",
     "TextInput",
     "Video" 
   ]

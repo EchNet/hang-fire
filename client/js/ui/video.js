@@ -2,13 +2,22 @@
 // Sourced by either string (URL) or stream.
 // Has custom controls.
 
-define([ "jquery", "ui/button", "ui/component" ], function($, Button, Component) {
+define([ "jquery", "ui/button", "ui/component", "ui/sizegoal" ], function($, Button, Component, SizeGoal) {
+
+  var resizer = new SizeGoal({ componentProperty: "$videoElement" });
 
   return Component.defineClass(function(c) {
 
     c.defineDefaultOptions({
-      cssClass: "video"
+      cssClass: "video",
+      initialWidth: 40,
+      initialHeight: 40
     });
+
+    function setSize($ele, width, height) {
+      $ele.css("width", width);
+      $ele.css("height", height);
+    }
 
     function initControls(self) {
 
@@ -87,6 +96,7 @@ define([ "jquery", "ui/button", "ui/component" ], function($, Button, Component)
       self.ele
         .append(self.playOverlay.ele)
         .append(self.controls.ele);
+      setSize(self.$videoElement, self.options.initialWidth, self.options.initialHeight);
     });
 
     c.extendPrototype({
@@ -95,23 +105,37 @@ define([ "jquery", "ui/button", "ui/component" ], function($, Button, Component)
         options = options || {};
         var promise = $.Deferred();
         var theVideo = self.videoElement;
+        var srcIsUrl = typeof src == "string";
+
+        if (srcIsUrl) {
+          setSize(self.$videoElement, self.options.initialWidth, self.options.initialHeight);
+        }
+        self.controls.visible = false;
+        self.playOverlay.visible = false;
 
         theVideo.onloadedmetadata = function() {
-          // Set the width of the container to match the intrinsic width of the video.
-          // This enables us to center the container using margin: auto.
-          self.ele.css("width", theVideo.videoWidth);
+          if (srcIsUrl) {
+            // Set the width of the container to match the intrinsic width of the video.
+            resizer.addGoal(self, theVideo.videoWidth, theVideo.videoHeight).then(function() {
+              self.ele.css("width", theVideo.videoWidth);
+              self.controls.visible = srcIsUrl;
+              self.playOverlay.visible = true;
+            });
+          }
+          else {
+            self.ele.css("width", theVideo.videoWidth);
+            setSize(self.$videoElement, theVideo.videoWidth, theVideo.videoHeight);
+          }
           promise.resolve(theVideo);
         }
         theVideo.onerror = function(err) {
           promise.reject(err);
         }
 
-        var srcIsUrl = typeof src == "string";
         theVideo.src = srcIsUrl ? src : "";
         theVideo.srcObject = srcIsUrl ? null : src;
         theVideo.autoplay = options.autoplay || (!!src && !srcIsUrl);
         theVideo.muted = !srcIsUrl;
-        self.controls.visible = srcIsUrl;
         if (src == null) {
           promise.resolve(theVideo);
         }
@@ -131,6 +155,12 @@ define([ "jquery", "ui/button", "ui/component" ], function($, Button, Component)
     c.defineProperty("videoElement", {
       get: function() {
         return this.ele[0].children[0];
+      }
+    });
+
+    c.defineProperty("$videoElement", {
+      get: function() {
+        return $(this.videoElement);
       }
     });
   });
