@@ -21,11 +21,11 @@ function($,        Services,   Login,   Listing,   ActivityStarter,   WaitAnim, 
       var titleLabel = new ui.Component({ html: "<span>", cssClass: "title" }).setText("LIVING CONNECTIONS");
       var userNameLabel = new ui.Component({ html: "<span>", cssClass: "userName" });
       var emailLabel = new ui.Component({ html: "<span>", cssClass: "hilite" });
-      var logoutLink = new ui.Component({ html: "<a>", cssClass: "logout" }).setText("Log out").addPlugin({
-        onClick: function() {
-          sessionManager.logOut();
-        }
-      });
+      //var logoutLink = new ui.Component({ html: "<a>", cssClass: "logout" }).setText("Log out").addPlugin({
+        //onClick: function() {
+          //sessionManager.logOut();
+        //}
+      //});
 
       self.ele
         .addClass("header")
