@@ -1,7 +1,7 @@
 // appui.js
 
-define([ "jquery", "services", "Login", "Listing", "ActivityStarter", "waitanim", "ui/index" ],
-function($,        Services,   Login,   Listing,   ActivityStarter,   WaitAnim,   ui) {
+define([ "jquery", "services", "Login", "Listing", "ActionItem", "ActivityStarter", "waitanim", "ui/index" ],
+function($,        Services,   Login,   Listing,   ActionItem,   ActivityStarter,   WaitAnim,   ui) {
 
   var NO_VID =
     "Sorry, this browser is not capable of sending and receiving Living Connections videograms.";
@@ -18,9 +18,17 @@ function($,        Services,   Login,   Listing,   ActivityStarter,   WaitAnim, 
     c.defineInitializer(function() {
       var self = this;
 
+      function editUser() {
+        self.invokePlugin("editUser");
+      }
+
       var titleLabel = new ui.Component({ html: "<span>", cssClass: "title" }).setText("LIVING CONNECTIONS");
-      var userNameLabel = new ui.Component({ html: "<span>", cssClass: "userName" });
-      var emailLabel = new ui.Component({ html: "<span>", cssClass: "hilite" });
+      var userNameLabel = new ui.Component({ html: "<span>", cssClass: "userName" }).addPlugin({
+        onClick: editUser
+      });
+      var emailLabel = new ui.Component({ html: "<span>", cssClass: "hilite" }).addPlugin({
+        onClick: editUser
+      });
       //var logoutLink = new ui.Component({ html: "<a>", cssClass: "logout" }).setText("Log out").addPlugin({
         //onClick: function() {
           //sessionManager.logOut();
@@ -113,8 +121,10 @@ function($,        Services,   Login,   Listing,   ActivityStarter,   WaitAnim, 
     c.defineInitializer(function() {
       var self = this;
 
+      var mainHeader = new MainHeader().addPlugin(self);
+
       self.ele
-        .append(new MainHeader().ele)
+        .append(mainHeader.ele)
         .append($("<div>").addClass("body"));
 
       self.fadeGoal = new ui.FadeGoal();
@@ -124,6 +134,13 @@ function($,        Services,   Login,   Listing,   ActivityStarter,   WaitAnim, 
       open: function() {
         var self = this;
         return Main_showListing(self);
+      },
+
+      editUser: function() {
+        var self = this;
+        if (!self.activity && sessionManager.user && sessionManager.user.name) {
+          Main_openActionItem(self, new ActionItem({ id: "usr-upd" }));
+        }
       },
 
       close: function() {

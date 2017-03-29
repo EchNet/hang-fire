@@ -133,13 +133,11 @@ define([ "util/HttpMethod" ], function(HttpMethod) {
     var UpdateProfileMethod = new HttpMethod.PutForm()
       .addPathComponent("/api/profile")
       .addQueryParameter("assetId")
-      .addQueryParameter("name")
       .build();
 
     return function updateProfile(form) {
       return new UpdateProfileMethod()
         .setAssetId(form.assetId)
-        .setName(form.name)
         .execute();
     }
   }
@@ -158,7 +156,7 @@ define([ "util/HttpMethod" ], function(HttpMethod) {
         "upd": makeUpdateInvite(),
         "del": makeDeleteInvite()
       },
-      "pro": {
+      "usr": {
         "cre": makeUpdateProfile(),
         "upd": makeUpdateProfile()
       }

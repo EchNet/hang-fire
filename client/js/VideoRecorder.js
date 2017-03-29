@@ -26,7 +26,8 @@ function($,        Services,   ui,         WaitAnim) {
   var ControlPanel = ui.Carton.defineClass(function(c) {
 
     c.defineDefaultOptions({
-      initialState: STATE_WAITING
+      initialState: STATE_WAITING,
+      acceptButtonLabel: "Send it"
     });
 
     c.defineInitializer(function() {
@@ -52,7 +53,7 @@ function($,        Services,   ui,         WaitAnim) {
       declareDefaultButtonForState(STATE_RECORDING, stopButton);
 
       // Review your XXX...  [Send it] or [Re-record it]
-      var acceptButton = ui.Button.create("Send it", function() {
+      var acceptButton = ui.Button.create(self.options.acceptButtonLabel, function() {
         self.invokePlugin("acceptRecording");
       });
       declareDefaultButtonForState(STATE_REVIEW, acceptButton);

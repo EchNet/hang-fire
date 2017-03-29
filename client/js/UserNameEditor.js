@@ -1,7 +1,7 @@
-// usereditor.js - User Editor component
+// UserNameEditor.js - User Editor component
 
-define([ "jquery", "services", "Activity", "ui/index", "waitanim" ],
-function($,        Services,   Activity,     ui,         WaitAnim) {
+define([ "jquery", "services", "Activity", "ui/index", "waitanim", "VideoRecorder" ],
+function($,        Services,   Activity,   ui,         WaitAnim,   VideoRecorder) {
 
   var sessionManager = Services.sessionManager;
 
@@ -22,6 +22,11 @@ function($,        Services,   Activity,     ui,         WaitAnim) {
 
   function getUserId() {
     return getUser().id;
+  }
+
+  function getAssetUrl() {
+    var user = getUser();
+    return user && user.asset && user.asset.url;
   }
 
   return Activity.defineClass(function(c) {
@@ -88,9 +93,17 @@ function($,        Services,   Activity,     ui,         WaitAnim) {
       }
     }
 
+    function initVideoRecorder(self) {
+      self.videoRecorder = new VideoRecorder("<div>", {
+        what: "profile video",
+        acceptButtonLabel: "Save it"
+      }).addPlugin(self);
+    }
+
     c.defineInitializer(function() {
       var self = this;
       initController(self);
+      initVideoRecorder(self);
       self.ele
         .append($("<div>")
           .addClass("panel")
@@ -102,13 +115,24 @@ function($,        Services,   Activity,     ui,         WaitAnim) {
           .append($("<div>")
             .text("This is the name that is shown to other Living Connections users " +
                   "and appears in the invitations that you send."))
-          );
+          .append($("<div>")
+            .text("You may also keep a profile video. This is how you appear to other users."))
+          )
+        .append(self.videoRecorder.ele);
     });
 
     c.extendPrototype({
       open: function() {
         this._open();
+        this.videoRecorder.open(getAssetUrl());
         return this;
+      },
+      close: function() {
+        this.videoRecorder.close();
+        return this;
+      },
+      saveMessage: function(assetId) {
+        return this.saveForm({ assetId: assetId });
       },
       exit: function() {
         this.invokePlugin("exit");

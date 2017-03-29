@@ -56,14 +56,10 @@ define([ "jquery", "Asset", "util/When" ], function($, Asset, When) {
       return span("Update invitation");
     case "rem-cre":
       return span("Create a reminder");
-    case "pro-cre":
-      return span("Record your profile video");
-    case "pro-upd":
-      return span("Update your profile video");
     case "usr-cre":
       return span("Start by picking your user name");
     case "usr-upd":
-      return span("Change your user name");
+      return span("Update your user info");
     }
     return span();
   }
@@ -107,9 +103,6 @@ define([ "jquery", "Asset", "util/When" ], function($, Asset, When) {
     wrap(data);
 
     var asset = data.user && data.user.asset;
-    if (!asset) {
-      asset = data.message && data.message.asset;
-    }
     if (!asset) {
       if (data.thread && data.user) {
         for (var i = 0; i < data.thread.length; ++i) {

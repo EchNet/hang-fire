@@ -1,9 +1,9 @@
 // ActivityStarter.js - logic for selecting, creating, and initializing an activity.
 
 define([ "ConnectionViewer", "AnnouncementEditor", "CreateInviteEditor",
-  "UpdateInviteEditor", "ProfileEditor", "UserNameEditor", "InviteViewer", "CreateReminderEditor" ],
+  "UpdateInviteEditor", "UserNameEditor", "InviteViewer", "CreateReminderEditor" ],
 function( ConnectionViewer,  AnnouncementEditor,   CreateInviteEditor,
-  UpdateInviteEditor, ProfileEditor,   UserNameEditor,   InviteViewer, CreateReminderEditor) {
+  UpdateInviteEditor,   UserNameEditor,   InviteViewer, CreateReminderEditor) {
 
   function classForActionItem(actionItem) {
     if (actionItem.topic == "inv") {

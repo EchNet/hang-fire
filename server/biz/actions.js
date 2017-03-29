@@ -8,8 +8,7 @@ const Message = require("../models/index").Message;
 const TOPIC_INVITATION = "inv";    // Ask another user to connect.
 const TOPIC_CONNECTION = "con";    // Stay in touch with another user.
 const TOPIC_REMINDER = "rem";      // A message sent at a specific time, possibly repeating.
-const TOPIC_USER = "usr";          // Name and other details.
-const TOPIC_PROFILE = "pro";       // About me...
+const TOPIC_USER = "usr";          // User name and video.
 const TOPIC_ANNOUNCEMENT = "ann";  // A broadcast message, usually by the administrator.
 
 const ACTION_CREATE = "cre";       // Create a message and a wrapper for it.
@@ -36,10 +35,6 @@ const PROPERTIES = {
     "rec": { priority: 92, },
     "cre": { priority: 60 },
     "upd": { priority: 30 }
-  },
-  "pro": { 
-    "cre": { priority: 40 },
-    "upd": { priority: 20 }
   },
   "usr": {
     "cre": { priority: 50 },
@@ -129,13 +124,6 @@ function addInvitationItems(compiler) {
   }
 }
 
-function addProfileItems(compiler) {
-  addActionItem(compiler, TOPIC_PROFILE, compiler.user.asset ? ACTION_UPDATE : ACTION_CREATE, {
-    user: compiler.user
-  });
-  addActionItem(compiler, TOPIC_USER, compiler.user.name ? ACTION_UPDATE : ACTION_CREATE);
-}
-
 function addAnnouncementItems(compiler) {
   var isAdmin = compiler.user.level <= 0;
   if (isAdmin) {
@@ -155,12 +143,14 @@ function addReminderItems(compiler) {
 }
 
 function createActionItems(compiler) {
-  addProfileItems(compiler);
   if (compiler.user.name) {
     addConnectionItems(compiler);
     addInvitationItems(compiler);
     addAnnouncementItems(compiler);
     addReminderItems(compiler);
+  }
+  else {
+    addActionItem(compiler, TOPIC_USER, ACTION_CREATE);
   }
 }
 
@@ -187,7 +177,8 @@ ActionCompiler.prototype.run = function() {
       user: {
         id: compiler.user.id,
         name: compiler.user.name,
-        email: compiler.emailProfile && compiler.emailProfile.email
+        email: compiler.emailProfile && compiler.emailProfile.email,
+        asset: compiler.user.asset
       },
       actionItems: finalizeActionItems(compiler)
     }
