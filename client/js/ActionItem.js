@@ -29,11 +29,11 @@ define([ "jquery", "Asset", "util/When" ], function($, Asset, When) {
   }
 
   function inviteNameAndEmail(invite) {
-    var ele = hilite(invite.recipientName);
+    var txt = invite.recipientName;
     if (invite.ticket && invite.ticket.email) {
-      ele = span().append(ele).append(span(" <" + invite.ticket.email + ">"));
+      txt += " <" + invite.ticket.email + ">";
     }
-    return ele;
+    return span(txt);
   }
 
   function titleFunc(topic, aspect, data) {
