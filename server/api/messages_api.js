@@ -3,6 +3,8 @@
 const Message = require("../models/index").Message;
 const Connection = require("../models/index").Connection;
 const ApiValidator = require("./api_validator");
+const UserMessageEvents = require("../models/index").UserMessageEvents;
+
 const Promise = require("promise");
 
 const DEFAULT_ANNOUNCEMENT_DURATION = 14*24*60*60*1000;   // 14 days
@@ -26,6 +28,12 @@ const VALIDATOR = new ApiValidator({
     defaultValue: 0,
     maxValue: Message.MAX_TYPE,
     minValue: 0,
+    type: "integer"
+  },
+  state: {
+    defaultValue: 0,
+    maxValue: Message.MESSAGE_STATE_VIEWED,
+    minValue: Message.MESSAGE_STATE_UNCHECKED,
     type: "integer"
   }
 });
