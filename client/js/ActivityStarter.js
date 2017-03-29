@@ -1,14 +1,11 @@
 // ActivityStarter.js - logic for selecting, creating, and initializing an activity.
 
-define([ "ConnectionViewer", "MessageViewer", "AnnouncementEditor", "CreateInviteEditor",
+define([ "ConnectionViewer", "AnnouncementEditor", "CreateInviteEditor",
   "UpdateInviteEditor", "ProfileEditor", "UserNameEditor", "InviteViewer", "CreateReminderEditor" ],
-function( ConnectionViewer,  MessageViewer,  AnnouncementEditor,   CreateInviteEditor,
+function( ConnectionViewer,  AnnouncementEditor,   CreateInviteEditor,
   UpdateInviteEditor, ProfileEditor,   UserNameEditor,   InviteViewer, CreateReminderEditor) {
 
   function classForActionItem(actionItem) {
-    if (actionItem.topic == "con") {
-      return ConnectionViewer;
-    }
     if (actionItem.topic == "inv") {
       switch (actionItem.aspect) {
       case "cre":
@@ -19,6 +16,9 @@ function( ConnectionViewer,  MessageViewer,  AnnouncementEditor,   CreateInviteE
         return InviteViewer;
       }
     }
+    if (actionItem.topic == "con") {
+      return ConnectionViewer;
+    }
     if (actionItem.topic == "rem") {
       switch (actionItem.aspect) {
       case "cre":
@@ -26,7 +26,7 @@ function( ConnectionViewer,  MessageViewer,  AnnouncementEditor,   CreateInviteE
       }
     }
     if (actionItem.aspect == "rec") {
-      return MessageViewer;
+      return ConnectionViewer;
     }
     switch (actionItem.topic) {
     case "ann":

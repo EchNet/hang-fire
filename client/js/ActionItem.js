@@ -28,15 +28,6 @@ define([ "jquery", "Asset", "util/When" ], function($, Asset, When) {
     return span(str).addClass("hilite");
   }
 
-  function userName(data, path) {
-    var name = data;
-    for (var i = 0; name && i < path.length; ++i) {
-      name = name[path[i]];
-    }
-    if (name) name = name.name;
-    return name ? hilite(name) : span("another user");
-  }
-
   function inviteNameAndEmail(invite) {
     var ele = hilite(invite.recipientName);
     if (invite.ticket && invite.ticket.email) {
@@ -56,7 +47,7 @@ define([ "jquery", "Asset", "util/When" ], function($, Asset, When) {
     case "con-new":
     case "con-in":
     case "con-out":
-      return userName(data, [ "user" ]);
+      return hilite(data.user.name || ("User " + data.user.id));
     case "inv-rec":
       return span("You have an invitation");
     case "inv-cre":
@@ -87,13 +78,19 @@ define([ "jquery", "Asset", "util/When" ], function($, Asset, When) {
     case "in":
     case "out":
       if (data.invite) {
-        return span("from ").append(userName(data, [ "invite", "fromUser" ]));
-      }
-      if (data.message) {
-        return span("from ").append(userName(data, [ "message", "fromUser" ])).append(span(" at " + when(data.message)));
+        return span("from " + data.invite.fromUser.name);
       }
       if (data.thread && data.thread.length) {
-        return span("last message from ").append(data.thread[0].fromUserId == data.user.id ? userName(data, [ "user" ]) : span("you")).append(span(" at " + when(data.thread[0])));
+        var msg = data.thread[0];
+        var txt;
+        if (topic == "ann") {
+          txt = "updated";
+        }
+        else {
+          txt = "last message from " + (msg.fromUserId == data.user.id ? data.user.name : "you");
+        }
+        txt += " at " + when(msg);
+        return span(txt);
       }
       break;
     case "upd":

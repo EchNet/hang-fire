@@ -142,13 +142,11 @@ function addAnnouncementItems(compiler) {
     addActionItem(compiler, TOPIC_ANNOUNCEMENT, ACTION_CREATE);
   }
   var announcements = compiler.announcements;
-  for (var i = 0; i < announcements.length; ++i) {
-    var ann = announcements[i];
-    if (ann.creatorId != compiler.user.id || !isAdmin) {
-      addActionItem(compiler, TOPIC_ANNOUNCEMENT, isAdmin ? ACTION_UPDATE : ACTION_RECEIVE, {
-        message: ann
-      });
-    }
+  if (announcements.length) {
+    addActionItem(compiler, TOPIC_ANNOUNCEMENT, ACTION_RECEIVE, {
+      user: announcements[0].fromUser,
+      thread: announcements
+    });
   }
 }
 
