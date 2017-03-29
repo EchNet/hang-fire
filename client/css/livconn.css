@@ -151,6 +151,10 @@ div {
 #app .userIdent {
   float: right;
   padding-right: 4px;
+  cursor: pointer
+}
+#app .userIdent:hover {
+  text-decoration: underline;
 }
 #app .logout {
   color: #ccb098;

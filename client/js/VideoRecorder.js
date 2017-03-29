@@ -40,11 +40,15 @@ function($,        Services,   ui,         WaitAnim) {
         self.defaultButtons[state] = button;
       }
 
-      // [Click here] to start recording
+      // [Click here] to start recording.  [Cancel]
       var startButton = ui.Button.create("Click here", function() {
         self.invokePlugin("startRecording");
       });
       declareDefaultButtonForState(STATE_READY, startButton);
+      var cancelButton = ui.Button.create("Cancel", function() {
+        self.invokePlugin("cancelRecording");
+      });
+      self.cancelButton = cancelButton;
 
       // Recording... [Stop]
       var stopButton = ui.Button.create("Stop", function() {
@@ -81,7 +85,8 @@ function($,        Services,   ui,         WaitAnim) {
       self.addCompartment(STATE_WAITING, new WaitAnim());
       self.addCompartment(STATE_READY, new ui.Component()
         .append(startButton)
-        .append(new ui.Component("<span>").setText(" to start recording your " + what + "."))
+        .append(new ui.Component("<span>").setText(" to start recording your " + what + ". "))
+        .append(cancelButton)
       );
       self.addCompartment(STATE_RECORDING, new ui.Component()
         .append(new ui.Component("<span>").setText("Recording... "))
@@ -216,6 +221,7 @@ function($,        Services,   ui,         WaitAnim) {
         else {
           toNextState(openCamera, STATE_READY);
         }
+        self.controlPanel.cancelButton.visible = !!url;
       },
 
       startRecording: function() {
@@ -223,6 +229,10 @@ function($,        Services,   ui,         WaitAnim) {
         showState(STATE_RECORDING);
         self.autoStopTime = now() + (self.options.maxSeconds * 1000);
         startCountdown();
+      },
+
+      cancelRecording: function() {
+        controller.open(self.url);
       },
 
       stopRecording: function() {
