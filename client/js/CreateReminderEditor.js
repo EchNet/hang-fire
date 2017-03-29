@@ -85,7 +85,7 @@ function($,        Activity,   VideoRecorder,   ui) {
 
     c.extendPrototype({
       open: function() {
-        this.nameAndEmailEditor.open();
+        //this.nameAndEmailEditor.open();
         return this;
       },
       openVideoRecorder: function() {
