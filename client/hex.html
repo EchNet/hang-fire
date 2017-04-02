@@ -2,7 +2,7 @@
 <head>
 <title>Hex</title>
 <style>
-#the_canvas {
+canvas {
 	background: #eee;
 	width: 200px;
 	height: 200px;
@@ -11,42 +11,54 @@
 </style>
 </head>
 <body>
-<canvas id="the_canvas" width="200" height="200"></canvas>
+<canvas id="canvas1" width="200" height="200"></canvas>
+<canvas id="canvas2" width="200" height="200"></canvas>
+<canvas id="canvas3" width="200" height="200"></canvas>
 </body>
 <script>
 
-	function clearCanvas(context, canvas) {
-		context.clearRect(0, 0, canvas.width, canvas.height);
-	}
-
-	function draw() {
-		var canvas = document.getElementById("the_canvas");
+	function drawRegularHexagon(canvas, options) {
 		var context = canvas.getContext("2d");
+		options = options || {};
 
-		var centerx = canvas.width / 2;
-		var centery = canvas.height / 2;
-		var radius = Math.min(canvas.width, canvas.height) / 2;
-		var edgeLength = radius;
-console.log('stats', centerx, centery, radius);
+		var radius = options.radius || (Math.min(canvas.width, canvas.height) / 2);
+		var x = options.x != null ? options.x : radius;
+		var y = options.y != null ? options.y : radius;
+		var angle = options.angle != null ? ((options.angle % 3) * Math.PI/12) : 0;
 
-		var x = centerx;
-		var y = centery - radius;
-console.log('moveTo', x, y);
+		x += Math.cos(angle) * radius;
+		y += Math.sin(angle) * radius;
+		angle += 2*Math.PI/3;
+
 		context.moveTo(x, y);
-		var angle = Math.PI/6;
 		for (var i = 0; i < 6; ++i) {
-			x += Math.cos(angle) * edgeLength;
-			y += Math.sin(angle) * edgeLength;
+			x += Math.cos(angle) * radius;
+			y += Math.sin(angle) * radius;
 			context.lineTo(x, y);
-console.log('lineTo', x, y);
 			angle += Math.PI/3;
 		}
 
-		context.strokeStyle = "rgba(0,0,0,1)";
+		context.strokeStyle = options.strokeStyle || "rgba(0,0,0,1)";
 		context.stroke();
 	}
 
-	setTimeout(draw, 1000);
+	setTimeout(function() {
+		drawRegularHexagon(document.getElementById("canvas1"));
+		drawRegularHexagon(document.getElementById("canvas2"), {
+			radius: 30,
+			x: 180,
+			y: 75,
+			angle: 1,
+			strokeStyle: "rgba(255,0,0,1)"
+		});
+		drawRegularHexagon(document.getElementById("canvas3"), {
+			radius: 50,
+			x: 100,
+			y: 75,
+			angle: 2,
+			strokeStyle: "rgba(255,0,0,1)"
+		});
+	}, 500);
 
 </script>
 </html>
