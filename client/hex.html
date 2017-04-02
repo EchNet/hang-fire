@@ -1,0 +1,53 @@
+<html>
+<head>
+<title>Hex</title>
+<style>
+#the_canvas {
+	background: #eee;
+	width: 200px;
+	height: 200px;
+	border: 1px #ccc solid;
+}
+</style>
+</head>
+<body>
+<canvas id="the_canvas" width="200" height="200"></canvas>
+</body>
+<script>
+
+	function clearCanvas(context, canvas) {
+		context.clearRect(0, 0, canvas.width, canvas.height);
+	}
+
+	function draw() {
+		var canvas = document.getElementById("the_canvas");
+		var context = canvas.getContext("2d");
+
+		var centerx = canvas.width / 2;
+		var centery = canvas.height / 2;
+		var radius = Math.min(canvas.width, canvas.height) / 2;
+		var edgeLength = radius;
+console.log('stats', centerx, centery, radius);
+
+		var x = centerx;
+		var y = centery - radius;
+console.log('moveTo', x, y);
+		context.moveTo(x, y);
+		var angle = Math.PI/6;
+		for (var i = 0; i < 6; ++i) {
+			x += Math.cos(angle) * edgeLength;
+			y += Math.sin(angle) * edgeLength;
+			context.lineTo(x, y);
+console.log('lineTo', x, y);
+			angle += Math.PI/3;
+		}
+
+		context.strokeStyle = "rgba(0,0,0,1)";
+		context.stroke();
+	}
+
+	setTimeout(draw, 1000);
+
+</script>
+</html>
+
