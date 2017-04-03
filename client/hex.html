@@ -4,32 +4,28 @@
 <style>
 canvas {
 	background: #eee;
-	width: 200px;
-	height: 200px;
 	border: 1px #ccc solid;
 }
 </style>
 </head>
 <body>
-<canvas id="canvas1" width="200" height="200"></canvas>
-<canvas id="canvas2" width="200" height="200"></canvas>
-<canvas id="canvas3" width="200" height="200"></canvas>
+<canvas id="canvas1" width="400" height="400"></canvas>
 </body>
+<script src="js/lib/jquery-3.1.1.slim.min.js"></script>
 <script>
 
-	function drawRegularHexagon(canvas, options) {
+	function withCanvas(id, func) {
+		var canvas = document.getElementById(id);
 		var context = canvas.getContext("2d");
-		options = options || {};
+		func(context, canvas);
+	}
 
-		var radius = options.radius || (Math.min(canvas.width, canvas.height) / 2);
-		var x = options.x != null ? options.x : radius;
-		var y = options.y != null ? options.y : radius;
-		var angle = options.angle != null ? ((options.angle % 3) * Math.PI/12) : 0;
-
+	function traceRegularHexagon(context, x, y, radius, angle) {
 		x += Math.cos(angle) * radius;
 		y += Math.sin(angle) * radius;
 		angle += 2*Math.PI/3;
 
+    context.beginPath();
 		context.moveTo(x, y);
 		for (var i = 0; i < 6; ++i) {
 			x += Math.cos(angle) * radius;
@@ -37,26 +33,94 @@ canvas {
 			context.lineTo(x, y);
 			angle += Math.PI/3;
 		}
+    context.closePath();    
+	}
 
-		context.strokeStyle = options.strokeStyle || "rgba(0,0,0,1)";
-		context.stroke();
+	function drawRegularHexagon(context, options) {
+		options = options || { strokeStyle: "rgba(0,0,0,1)" };
+		var radius = options.radius || 100;
+		var x = options.x != null ? options.x : radius;
+		var y = options.y != null ? options.y : radius;
+		var angle = options.angle != null ? (options.angle * Math.PI/180) : 0;
+
+		context.save();
+		traceRegularHexagon(context, x, y, radius, angle);
+    context.clip();
+		if (options.fillStyle) {
+			context.fillStyle = options.fillStyle;
+			context.fillRect(x - radius, y - radius, radius*2, radius*2);
+		}
+		else {
+			context.clearRect(x - radius, y - radius, radius*2, radius*2);
+		}
+		if (options.image) {
+			context.drawImage(options.image, x - radius, y - radius, radius*2, radius*2);
+		}
+		context.restore();
+		if (options.strokeStyle) {
+			context.strokeStyle = options.strokeStyle;
+			if (options.lineWidth) {
+				context.lineWidth = options.lineWidth;
+			}
+			context.stroke();
+		}
+	}
+
+	function loadImage(url) {
+		var promise = $.Deferred();
+		var img = new Image();
+		img.onload = function() { 
+			promise.resolve(img);
+		};
+		img.onerror = function(error) {
+			promise.reject(error);
+		}
+		img.crossOrigin = "anonymous";
+		img.src = url;
+		return promise;
 	}
 
 	setTimeout(function() {
-		drawRegularHexagon(document.getElementById("canvas1"));
-		drawRegularHexagon(document.getElementById("canvas2"), {
-			radius: 30,
-			x: 180,
-			y: 75,
-			angle: 1,
-			strokeStyle: "rgba(255,0,0,1)"
-		});
-		drawRegularHexagon(document.getElementById("canvas3"), {
-			radius: 50,
-			x: 100,
-			y: 75,
-			angle: 2,
-			strokeStyle: "rgba(255,0,0,1)"
+		withCanvas("canvas1", function(context) {
+			drawRegularHexagon(context);
+			drawRegularHexagon(context, {
+				radius: 30,
+				x: 350,
+				y: 75,
+				angle: 10,
+				fillStyle: "rgba(0,0,200,1)",
+				strokeStyle: "rgba(255,0,0,1)"
+			});
+			drawRegularHexagon(context, {
+				radius: 50,
+				x: 300,
+				y: 75,
+				angle: 2,
+				strokeStyle: "rgba(55,255,0,1)"
+			});
+			drawRegularHexagon(context, {
+				radius: 60,
+				x: 280,
+				y: 75,
+				angle: 10,
+				fillStyle: "rgba(55,0,155,1)"
+			});
+			loadImage("img/usr-cre.png").then(function(img) {
+				drawRegularHexagon(context, {
+					x: 230,
+					y: 250,
+					image: img
+				});
+				drawRegularHexagon(context, {
+					radius: 50,
+					x: 180,
+					y: 275,
+					angle: 2,
+					image: img,
+					strokeStyle: "rgba(55,255,0,1)",
+					lineWidth: 3
+				});
+			});
 		});
 	}, 500);
 
