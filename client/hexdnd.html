@@ -159,11 +159,28 @@ canvas.drawing {
 		});
 	}
 
+	function round(n) {
+		return Math.floor(n + 0.5);
+	}
+
 	function closestHex(e) {
-		return { x: 100, y: 100 };
+		var x = e.offsetX;
+		var y = e.offsetY;
+		var diameter = config.canvas.elementRadius * 2;
+		var columnWidth = diameter * Math.sqrt(2) / 2;
+		var column = round(x/columnWidth);
+		var centerX = (column - 0.5) * columnWidth;
+		var rowHeight = diameter;
+		var rowOffset = (column % 2) * (rowHeight/2);
+		var row = round((y - rowOffset) / rowHeight);
+		var centerY = row*rowHeight + rowOffset;
+		return {
+			x: centerX, y: centerY
+		}
 	}
 
 	function showFeedback(canvas, e) {
+		clearCanvas(canvas);
 		var center = closestHex(e);
 		if (center) {
 			withContext(canvas, function(context) {
@@ -244,7 +261,7 @@ canvas.drawing {
 	function handleDrop(e) {
 		e.stopPropagation && e.stopPropagation();
 		clearCanvas(this);
-		var center = closestHex(e.offsetX, e.offsetY);
+		var center = closestHex(e);
 		if (center) {
 			var cIndex = addToCanvas(getDraggedPaletteEntry(e), center);
 			drawCanvasEntry(cIndex);
