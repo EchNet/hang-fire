@@ -35,6 +35,8 @@ canvas.drawing {
 			elementRadius: 40
 		},
 		canvas: {
+			width: 800,
+			height: 300, 
 			elementRadius: 40,
 			lineStyle: "rgba(150,150,150,0.5)",
 			lineWidth: 2
@@ -164,18 +166,37 @@ canvas.drawing {
 	}
 
 	function closestHex(e) {
+		var radius = config.canvas.elementRadius;
+		var canvasWidth = config.canvas.width;
+		var canvasHeight = config.canvas.height;
+		var rowOffset = radius * Math.sqrt(3);
+		var columnOffset = radius * Math.sqrt(2);
+
 		var x = e.offsetX;
 		var y = e.offsetY;
-		var diameter = config.canvas.elementRadius * 2;
-		var columnWidth = diameter * Math.sqrt(2) / 2;
-		var column = round(x/columnWidth);
-		var centerX = (column - 0.5) * columnWidth;
-		var rowHeight = diameter;
-		var rowOffset = (column % 2) * (rowHeight/2);
-		var row = round((y - rowOffset) / rowHeight);
-		var centerY = row*rowHeight + rowOffset;
-		return {
-			x: centerX, y: centerY
+
+		var best = {};
+
+		var centerX = -rowOffset;
+		for (var col = -1; centerX < canvasWidth + columnOffset; ++col) {
+			var centerY = (col % 2) * rowOffset/2;
+			while (centerY < canvasHeight + rowOffset) {
+				var dsq = (centerX-x)*(centerX-x) + (centerY-y)*(centerY-y);
+				if (best.dsq == null || dsq < best.dsq) {
+					best.dsq = dsq;
+					best.centerX = centerX;
+					best.centerY = centerY;
+				}
+				centerY += rowOffset;
+			}
+			centerX += columnOffset;
+		}
+
+		if (best.centerX != null && best.centerX >= 0 && best.centerX < canvasWidth &&
+			best.centerY >= 0 && best.centerY < canvasHeight) {
+			return {
+				x: best.centerX, y: best.centerY
+			}
 		}
 	}
 
