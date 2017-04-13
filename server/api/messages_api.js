@@ -3,6 +3,10 @@
 const Message = require("../models/index").Message;
 const Connection = require("../models/index").Connection;
 const ApiValidator = require("./api_validator");
+const UserMessageEvents = require("../models/index").UserMessageEvents;
+const CONFIG = require("../conf");
+var sendMessageViewReminders = require("../../scheduler/sendMessageViewReminders");
+
 const Promise = require("promise");
 
 const DEFAULT_ANNOUNCEMENT_DURATION = 14*24*60*60*1000;   // 14 days
@@ -26,6 +30,12 @@ const VALIDATOR = new ApiValidator({
     defaultValue: 0,
     maxValue: Message.MAX_TYPE,
     minValue: 0,
+    type: "integer"
+  },
+  state: {
+    defaultValue: 0,
+    maxValue: Message.MESSAGE_STATE_VIEWED,
+    minValue: Message.MESSAGE_STATE_UNCHECKED,
     type: "integer"
   }
 });
@@ -119,6 +129,7 @@ router.post("/", function(req, res) {
 router.put("/:id", function(req, res) {
   res.jsonResultOf(new Promise(function(resolve) {
     var fields = VALIDATOR.prevalidateUpdate(req.body);
+    console.log(fields);
     resolve(Message.findById(req.params.id)
       .then(function(message) {
         if (!message) {
@@ -148,5 +159,43 @@ router.put("/:id", function(req, res) {
     );
   }))
 });
+
+if (CONFIG.env == "test") {
+ router.post("/sendreminders/:currTime", function(req, res, next) {
+ var currDate = new Date(req.params.currTime);
+ console.log('Input Date:' + currDate);
+ const processUnreadMessages = new sendMessageViewReminders() ;
+ processUnreadMessages.processMessages(req, currDate).then(function(result) {
+
+     if (result.remindersSent.length >0)
+         { 
+             jsonSuccessString = {'result':'success, emails sent'} 
+             res.status(200).send(jsonSuccessString);
+         }  else {
+             jsonSuccessString = {'result':'no email reminders required'} 
+             res.status(401).send(jsonSuccessString);     
+         }
+         
+    
+    })
+  })
+}
+
+if (CONFIG.env == "test") {
+router.put("/updateCreatedAt/:id", function(req, res) {
+  res.jsonResultOf(new Promise(function(resolve) {
+    var fields = req.body;
+    console.log(fields);
+    resolve(Message.findById(req.params.id)
+      .then(function(message) {
+        if (!message) {
+          throw { status: 404 };
+        }
+        return message.updateAttributes(fields);
+      })
+    );
+  }))
+});
+}
 
 module.exports = router;

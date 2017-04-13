@@ -13,12 +13,20 @@ module.exports = function(sequelize, DataTypes) {
   const REMINDER_TYPE = 5;
   const MAX_TYPE = 5;
 
+  const MESSAGE_STATE_UNCHECKED = 0;
+  const MESSAGE_STATE_UNREAD = 1;
+  const MESSAGE_STATE_REMINDER_SENT = 2;
+  const MESSAGE_STATE_VIEWED = 3;
+
+
   function schema() {
     return {
       endDate: DataTypes.DATE,
       startDate: DataTypes.DATE,
       type: DataTypes.INTEGER,
-      status: DataTypes.INTEGER
+      status: DataTypes.INTEGER,
+      state: DataTypes.INTEGER,
+      createdAt: DataTypes.DATE
     }
   }
 
@@ -197,6 +205,15 @@ module.exports = function(sequelize, DataTypes) {
     }, options);
   }
 
+  function findUnreadMessages(options) {
+   return Message.findAll({
+      where: { 
+        "state": { "$in": [ MESSAGE_STATE_UNCHECKED, MESSAGE_STATE_UNREAD ] }},
+      include: includes(options), 
+      order: [ [ "createdAt", "ASC" ] ]
+    })
+  }
+
   function findThread(u1, u2, options) {
     return findAllWhere({
       "type": { "$in": [ GREETING_TYPE, INVITE_TYPE ] },
@@ -234,6 +251,7 @@ module.exports = function(sequelize, DataTypes) {
       findCurrentRemindersforSender: findCurrentRemindersforSender,
       findById: findById,
       findByReceiver: findByReceiver,
+      findUnreadMessages: findUnreadMessages,
       findThread: findThread
     }
   });
