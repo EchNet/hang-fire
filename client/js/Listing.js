@@ -4,6 +4,22 @@ define([ "jquery", "ui/index", "services" ], function($, ui, Services) {
 
   return ui.Component.defineClass(function(c) {
 
+    function openActionItem(self, actionItem) {
+      if (self.isOpen) {
+        self.invokePlugin("openActionItem", actionItem);
+      }
+    }
+
+    function startLaunchTimeout(self, actionItem) {
+      self.launchTimeout = setTimeout(function() {
+        openActionItem(self, actionItem);
+      }, 3000);
+    }
+
+    function cancelLaunchTimeout(self) {
+      clearTimeout(self.launchTimeout);
+    }
+
     function renderItem(self, actionItem) {
       return $("<div>")
         .addClass("item")
@@ -20,9 +36,7 @@ define([ "jquery", "ui/index", "services" ], function($, ui, Services) {
             .append(actionItem.subtitle))
         )
         .click(function() {
-          if (self.isOpen) {
-            self.invokePlugin("openActionItem", actionItem);
-          }
+          openActionItem(self, actionItem);
         })
     }
 
@@ -30,17 +44,23 @@ define([ "jquery", "ui/index", "services" ], function($, ui, Services) {
       var container = self.container.empty()      // TODO: render incrememtally.
       var lastBatch = self.lastBatch;
       var newBatch = {};
+      cancelLaunchTimeout(self);
       if (actionItems) {
         for (var i = 0; i < actionItems.length; ++i) {
           var actionItem = actionItems[i];
           var itemView = renderItem(self, actionItem).appendTo(container);
+          /***
           if (lastBatch && !(actionItem.id in lastBatch)) {
             itemView.addClass("new");
             if (self.chime) {
               self.chime.play();
             }
           }
+          ***/
           newBatch[actionItem.id] = actionItem;
+        }
+        if (actionItems.length == 1) {
+          startLaunchTimeout(self, actionItems[0]);
         }
       }
       self.lastBatch = newBatch;
@@ -69,6 +89,7 @@ define([ "jquery", "ui/index", "services" ], function($, ui, Services) {
       },
       close: function() {
         var self = this;
+        cancelLaunchTimeout(self);
         self.isOpen = false;
         if (self.closeHandle) {
           self.closeHandle.undo();

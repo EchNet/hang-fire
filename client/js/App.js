@@ -108,6 +108,7 @@ function($,        Services,   Login,   Listing,   ActionItem,   ActivityStarter
       var activity = Main_newActivity(self, actionItem);
       Main_appendComponent(self, activity);
       if (self.listing) {
+        self.listing.close();
         self.fadeGoal.addGoal(self.listing, 0);
       }
       Main_closeCurrentActivity(self);
