@@ -183,25 +183,31 @@ div {
   color: #004;
   box-shadow: 2px 2px 2px 2px rgba(0,0,0,0.2);
   width: 440px;
-  display: inline-block;
+  height: 64px;
+  overflow: hidden;
+  position: relative;
 }
 #app .listing .item:hover {
   background-color: #fff8e8;
 }
+#app .listing .item .bigIcon {
+  width: 64px;
+  height: 64px;
+}
+#app .listing .item .content {
+  position: absolute;
+  top: 4px;
+  left: 80px;
+  width: 378px;
+  text-align: right;
+}
 #app .listing .item .title {
-  float: right;
   font-size: 20px;
 }
 #app .listing .item .subtitle {
-  margin-top: 5px;
-  clear: right;
-  float: right;
+  padding-top: 5px;
   font-size: 14px;
   font-style: italic;
-}
-#app img.bigIcon {
-  width: 64px;
-  height: 64px;
 }
 #app .activity {
   background-color: white;

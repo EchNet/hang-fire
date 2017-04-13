@@ -11,11 +11,14 @@ define([ "jquery", "ui/index", "services" ], function($, ui, Services) {
           .addClass("bigIcon")
           .attr("src", actionItem.iconUrl))
         .append($("<div>")
-          .addClass("title")
-          .append(actionItem.title))
-        .append($("<div>")
-          .addClass("subtitle")
-          .append(actionItem.subtitle))
+          .addClass("content")
+          .append($("<div>")
+            .addClass("title")
+            .append(actionItem.title))
+          .append($("<div>")
+            .addClass("subtitle")
+            .append(actionItem.subtitle))
+        )
         .click(function() {
           if (self.isOpen) {
             self.invokePlugin("openActionItem", actionItem);

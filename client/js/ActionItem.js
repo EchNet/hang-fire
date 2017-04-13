@@ -57,7 +57,7 @@ define([ "jquery", "Asset", "util/When" ], function($, Asset, When) {
     case "rem-cre":
       return span("Create a reminder");
     case "usr-cre":
-      return span("Start by picking your user name");
+      return span("Get started");
     case "usr-upd":
       return span("Update your user info");
     }
@@ -92,6 +92,10 @@ define([ "jquery", "Asset", "util/When" ], function($, Asset, When) {
     case "upd":
       if (data.invite) {
         return inviteNameAndEmail(data.invite);
+      }
+    case "cre":
+      if (topic == "usr") {
+        return "Choose how other Living Connections users will see you.";
       }
     }
     return span();
