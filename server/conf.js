@@ -75,7 +75,6 @@ const OVERRIDES = {
       }
     },
     auth: {
-      grantAdminToLocalRequest: true,
       enableExtHeaderAccess: true
     },  
     clientServiceConfigurations: {
