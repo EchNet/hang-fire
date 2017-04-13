@@ -11,13 +11,13 @@ define([], function() {
 
   function toCloudinaryIcon(url) {
     return url
-      .replace(/webm$/, "jpg")
+      .replace(/\.[a-z]+$/, ".jpg")
       .replace(/v[0-9]+/, "w_400,h_400,c_crop,g_face,r_max/w_64");
   }
 
   function toCloudinaryThumb(url) {
     return url
-      .replace(/webm$/, "jpg")
+      .replace(/\.[a-z]+$/, ".jpg")
       .replace(/v[0-9]+/, "w_320,h_320,c_crop,g_face");
   }
 

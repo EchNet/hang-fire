@@ -56,6 +56,10 @@ define([ "jquery", "Asset", "util/When" ], function($, Asset, When) {
       return span("Update invitation");
     case "rem-cre":
       return span("Create a reminder");
+    case "pro-cre":
+      return span("Record your profile video");
+    case "pro-upd":
+      return span("Update your profile video");
     case "usr-cre":
       return span("Get started");
     case "usr-upd":

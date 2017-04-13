@@ -334,12 +334,12 @@ video {
   padding: 5px 20px;
 }
 #app .activity .panel > div {
-  margin-top: 5px;
+  margin: 9px 0px;
 }
 #app button {
   background-color: white;
   color: #004;
-  border: solid 1px #888;
+  border: solid 2px #888;
   border-radius: 8px;
   font-size: 18px;
   font-weight: bold;
@@ -354,7 +354,7 @@ video {
 }
 #app button:enabled.default {
   color: #070;
-  border: solid 3px #070;
+  border: solid 2px #070;
 }
 #app button:enabled:hover {
   background-color: #ec9;
@@ -362,7 +362,7 @@ video {
 #app input[type=text] {
   color: #004;
   padding: 4px;
-  width: 450px;
+  width: 350px;
 }
 input[type=text] {
   background-color: white;

@@ -129,19 +129,6 @@ define([ "util/HttpMethod" ], function(HttpMethod) {
     }
   }
 
-  function makeUpdateProfile() {
-    var UpdateProfileMethod = new HttpMethod.PutForm()
-      .addPathComponent("/api/profile")
-      .addQueryParameter("assetId")
-      .build();
-
-    return function updateProfile(form) {
-      return new UpdateProfileMethod()
-        .setAssetId(form.assetId)
-        .execute();
-    }
-  }
-
   function ApiService() {
 
     this.saveMethods = {
@@ -155,10 +142,6 @@ define([ "util/HttpMethod" ], function(HttpMethod) {
         "cre": makePostInvite(),
         "upd": makeUpdateInvite(),
         "del": makeDeleteInvite()
-      },
-      "usr": {
-        "cre": makeUpdateProfile(),
-        "upd": makeUpdateProfile()
       }
     }
   }
@@ -173,6 +156,11 @@ define([ "util/HttpMethod" ], function(HttpMethod) {
     .addPathComponent("api/users")
     .addPathParameter("id")
     .addQueryParameter("name")
+    .build();
+
+  var UpdateProfileMethod = new HttpMethod.PutForm()
+    .addPathComponent("/api/profile")
+    .addQueryParameter("assetId")
     .build();
 
   ApiService.prototype = {
@@ -208,6 +196,10 @@ define([ "util/HttpMethod" ], function(HttpMethod) {
 
     updateUser: function(id, name) {
       return new UpdateUserMethod().setId(id).setName(name).execute();
+    },
+
+    updateProfile: function(assetId) {
+      return new UpdateProfileMethod().setAssetId(assetId).execute();
     }
   }
 

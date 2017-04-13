@@ -80,12 +80,10 @@ define([ "jquery", "ui/component", ], function($, Component) {
       },
       set: function(enabled) {
         var self = this;
-        enabled = !!enabled;
-        if (self._enabled != enabled) {
-          self._enabled = enabled;
-          self.input.attr("disabled", !enabled);
-          self.input.attr("readonly", !enabled);
-        }
+        enabled = !!enabled;   // coerce to boolean
+        self._enabled = enabled;
+        self.input.attr("disabled", !enabled);
+        self.input.attr("readonly", !enabled);
       }
     });
 
