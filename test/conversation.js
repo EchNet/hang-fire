@@ -57,11 +57,13 @@ requestlc.describe("Actions related to connections", function(client) {
   }
 
   function findAction(actionResponse, pred) {
-    var actionList = actionResponse.actionItems;
-    expect(actionList).to.exist;
-    for (var i = 0; i < actionList.length; ++i) {
-      if (pred(actionList[i])) {
-        return actionList[i];
+    var actionGroups = actionResponse.actionGroups;
+    expect(actionGroups).to.exist;
+    for (var i = 0; i < actionGroups.length; ++i) {
+      for (var j = 0; j < actionGroups[i].actions.length; ++j) {
+        if (pred(actionGroups[i].actions[j])) {
+          return actionGroups[i].actions[j];
+        }
       }
     }
   }

@@ -5,161 +5,121 @@ const when = require("../util/when");
 const Miner = require("./miner");
 const Message = require("../models/index").Message;
 
-const TOPIC_INVITATION = "inv";    // Ask another user to connect.
-const TOPIC_CONNECTION = "con";    // Stay in touch with another user.
-const TOPIC_REMINDER = "rem";      // A message sent at a specific time, possibly repeating.
-const TOPIC_USER = "usr";          // User name and video.
-const TOPIC_ANNOUNCEMENT = "ann";  // A broadcast message, usually by the administrator.
-
-const ACTION_CREATE = "cre";       // Create a message and a wrapper for it.
-const ACTION_UPDATE = "upd";       // Replace the message in a wrapper with a new one.
-const ACTION_RECEIVE = "rec";      // Interact with an incoming message.
-
-const PROPERTIES = {
-  "con": {
-    "in": { priority: 94 },
-    "out": { priority: 35 },
-    "new": { priority: 70 }
-  },
-  "rem": { 
-    "rec": { priority: 95, },
-    "cre": { priority: 66 },
-    "upd": { priority: 1 }
-  },
-  "inv": { 
-    "rec": { priority: 93, },
-    "cre": { priority: 62 },
-    "upd": { priority: 31 }
-  },
-  "ann": {
-    "rec": { priority: 92, },
-    "cre": { priority: 60 },
-    "upd": { priority: 30 }
-  },
-  "usr": {
-    "cre": { priority: 50 },
-    "upd": { priority: 10 }
+function forEach(arrayOrHash, callback) {
+  for (var i in arrayOrHash) {
+    callback(arrayOrHash[i], i);
   }
-}
-
-const MAX_ACTION_ITEMS = 20;
-
-function byPriorityDesc(a, b) {
-  return b.priority - a.priority;
-}
-
-function priorityOfSubjectAction(topic, action) {
-  try {
-    return PROPERTIES[topic][action].priority;
-  }
-  catch (e) {
-    return 50;
-  }
+  return arrayOrHash;
 }
 
 function ActionCompiler(user) {
   this.user = user;
-  this.actionItems = [];
+  this.actionGroups = [
+    { priority: 0, actions: [] },
+    { priority: 1, actions: [] },
+    { priority: 2, actions: [] }
+  ];
 }
 
-function findObjectId(data) {
+function findField(data, fieldName) {
   if (data) {
     for (var i in data) {
-      if ("id" in data[i]) {
-        return data[i].id;
+      if (fieldName in data[i]) {
+        return data[i][fieldName];
       }
     }
   }
 }
 
-function addActionItem(compiler, topic, action, data) {
-  var id = topic + "-" + action;
-  var objectId = findObjectId(data);
+function createActionItem(id, data) {
+  var objectId, date;
+  if (data) {
+    objectId = findField(data, "id");
+    date = data.thread && data.thread[0].updatedAt;
+    if (!date) {
+      date = findField(data, "updatedAt");
+    }
+  }
   if (objectId) {
     id += "-" + objectId;
   }
-  compiler.actionItems.push(extend({
+  return extend({
     id: id,
-    priority: priorityOfSubjectAction(topic, action)
-  }, data));
-}
-
-function addConnectionItems(compiler) {
-  var others = compiler.others;
-  for (var otherUserId in others) {
-    var other = others[otherUserId];
-    var thread = other.thread;
-    var aspect = "new";
-    var data = {
-      user: other.user,
-      thread: thread || []
-    };
-    if (thread && thread.length) {
-      if (thread[0].fromUserId == otherUserId) {
-        aspect = thread[0].type == Message.GREETING_TYPE ? "in" : "new";
-      }
-      else {
-        aspect = "out";
-      }
-    }
-    addActionItem(compiler, TOPIC_CONNECTION, aspect, data);
-  }
-}
-
-function addInvitationItems(compiler) {
-  if (compiler.user.level <= 1 && compiler.user.name) {
-    addActionItem(compiler, TOPIC_INVITATION, ACTION_CREATE);
-  }
-  var incomingInvitations = compiler.incomingInvitations;
-  for (var i = 0; i < incomingInvitations.length; ++i) {
-    var inv = incomingInvitations[i];
-    addActionItem(compiler, TOPIC_INVITATION, ACTION_RECEIVE, { invite: inv });
-  }
-  var outgoingInvitations = compiler.outgoingInvitations;
-  for (var i = 0; i < outgoingInvitations.length; ++i) {
-    var inv = outgoingInvitations[i];
-    addActionItem(compiler, TOPIC_INVITATION, ACTION_UPDATE, {
-      invite: inv
-    });
-  }
-}
-
-function addAnnouncementItems(compiler) {
-  var isAdmin = compiler.user.level <= 0;
-  if (isAdmin) {
-    addActionItem(compiler, TOPIC_ANNOUNCEMENT, ACTION_CREATE);
-  }
-  var announcements = compiler.announcements;
-  if (announcements.length) {
-    addActionItem(compiler, TOPIC_ANNOUNCEMENT, ACTION_RECEIVE, {
-      user: announcements[0].fromUser,
-      thread: announcements
-    });
-  }
-}
-
-function addReminderItems(compiler) {
-  addActionItem(compiler, TOPIC_REMINDER, ACTION_CREATE);
+    date: date
+  }, data);
 }
 
 function createActionItems(compiler) {
+
+  function addActionItem(groupIndex, actionItem) {
+    compiler.actionGroups[groupIndex].actions.push(actionItem);
+  }
+
   if (compiler.user.name) {
-    addConnectionItems(compiler);
-    addInvitationItems(compiler);
-    addAnnouncementItems(compiler);
-    addReminderItems(compiler);
+
+    if (compiler.announcements.length) {
+      addActionItem(0, createActionItem("ann-rec", {
+        user: compiler.announcements[0].fromUser,
+        thread: compiler.announcements
+      }));
+    }
+
+    forEach(compiler.incomingInvitations, function(inv) {
+      addActionItem(0, createActionItem("inv-rec", { invite: inv }));
+    });
+
+    forEach(compiler.others, function(other) {
+      var thread = other.thread || [];
+      var id = "con-new";
+      var data = {
+        user: other.user,
+        thread: thread
+      };
+      if (thread.length) {
+        if (thread[0].fromUserId == other.user.id && thread[0].type == Message.GREETING_TYPE) {
+          addActionItem(0, createActionItem("con-in", data));
+        }
+        else {
+          id = "con-out";
+        }
+      }
+      addActionItem(1, createActionItem(id || "con-new", data));
+    });
+
+    forEach(compiler.outgoingInvitations, function(inv) {
+      addActionItem(1, createActionItem("inv-upd", { invite: inv }));
+    });
+
+    if (compiler.user.level <= 1) {
+      addActionItem(1, createActionItem("inv-cre"));
+    }
+
+    addActionItem(2, createActionItem("rem-cre"));
+
+    if (compiler.user.level <= 0) {    // admin
+      addActionItem(2, createActionItem("ann-cre"));
+    }
   }
   else {
-    addActionItem(compiler, TOPIC_USER, ACTION_CREATE);
+    addActionItem(2, createActionItem("usr-cre"));
   }
 }
 
-function finalizeActionItems(compiler) {
-  var actionItems = compiler.actionItems;
-  actionItems.sort(function(a, b) {
-    return b.priority - a.priority;
-  });
-  return actionItems.slice(0, MAX_ACTION_ITEMS);
+function postProcessGroups(actionGroups) {
+  for (var i = 0; i < actionGroups.length; ) {
+    if (!actionGroups[i].actions.length) {
+      actionGroups.splice(i, 1);
+    }
+    else {
+      actionGroups[i].actions.sort(function(a, b) {
+        var ta = a.date ? a.date.getTime() : 0;
+        var tb = a.date ? a.date.getTime() : 0;
+        return ta - tb;  // descending
+      });
+      ++i;
+    }
+  }
+  return actionGroups;
 }
 
 ActionCompiler.prototype.run = function() {
@@ -180,7 +140,7 @@ ActionCompiler.prototype.run = function() {
         email: compiler.emailProfile && compiler.emailProfile.email,
         asset: compiler.user.asset
       },
-      actionItems: finalizeActionItems(compiler)
+      actionGroups: postProcessGroups(compiler.actionGroups)
     }
   })
 }

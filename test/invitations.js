@@ -56,11 +56,13 @@ requestlc.describe("Invitation flow:", function(client) {
   }
 
   function findAction(actionResponse, pred) {
-    var actionList = actionResponse.actionItems;
-    expect(actionList).to.exist;
-    for (var i = 0; i < actionList.length; ++i) {
-      if (pred(actionList[i])) {
-        return actionList[i];
+    var actionGroups = actionResponse.actionGroups;
+    expect(actionGroups).to.exist;
+    for (var i = 0; i < actionGroups.length; ++i) {
+      for (var j = 0; j < actionGroups[i].actions.length; ++j) {
+        if (pred(actionGroups[i].actions[j])) {
+          return actionGroups[i].actions[j];
+        }
       }
     }
   }
@@ -126,8 +128,6 @@ requestlc.describe("Invitation flow:", function(client) {
     .then(function(actionResponse) {
       expect(actionResponse.user).to.exist;
       expect(parseInt(actionResponse.user.id)).to.equal(theSender.id);
-      var actionList = actionResponse.actionItems;
-      expect(actionList).to.exist;
       var updInvAction = findUpdateInviteAction(actionResponse);
       expect(updInvAction).to.exist;
       done();
@@ -193,8 +193,6 @@ requestlc.describe("Invitation flow:", function(client) {
         .then(function(actionResponse) {
           expect(actionResponse.user).to.exist;
           expect(parseInt(actionResponse.user.id)).to.equal(theSender.id);
-          var actionList = actionResponse.actionItems;
-          expect(actionList).to.exist;
           var greetingAction = findGreetingAction(actionResponse, theActionResponse.user.id);
           expect(greetingAction).to.exist;
           expect(greetingAction.thread).to.exist;
@@ -241,8 +239,6 @@ requestlc.describe("Invitation flow:", function(client) {
         .then(function(actionResponse) {
           expect(actionResponse.user).to.exist;
           expect(parseInt(actionResponse.user.id)).to.equal(theSender.id);
-          var actionList = actionResponse.actionItems;
-          expect(actionList).to.exist;
           var greetingAction = findGreetingAction(actionResponse, theActionResponse.user.id);
           expect(greetingAction).to.not.exist;
           done();
