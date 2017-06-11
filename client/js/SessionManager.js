@@ -4,7 +4,7 @@ define([ "jquery", "util/Cookie", "util/HttpMethod", "ui/observable", "ActionIte
 function($,        Cookie,        HttpMethod,        Observable,      ActionItem) {
 
   var DEFAULT_OPTIONS = {
-    pollingPeriod: 3000
+    pollingPeriod: 9000
   };
 
   function salt() {
@@ -43,6 +43,37 @@ function($,        Cookie,        HttpMethod,        Observable,      ActionItem
     self.actionItems.notifyChangeListeners();
   }
 
+  function equalActionGroups(ag1, ag2) {
+    if (ag1.length != ag2.length) return false;
+    for (var i = 0; i < ag1.length; ++i) {
+      var age1 = ag1[i];
+      var age2 = ag2[i];
+      if (age1.class != age2.class) return false;
+      if (age1.priority != age2.priority) return false;
+      if (age1.actions.length != age2.actions.length) return false;
+      for (var j = 0; j < age1.length; ++j) {
+        if (age1.actions[j].id != age2.actions[j].id) return false;
+      }
+    }
+    return true;
+  }
+
+  function wrapModel(rawActionGroups) {
+    var result = [];
+    for (var i = 0; i < rawActionGroups.length; ++i) {
+      var actionGroup = rawActionGroups[i];
+      var ele = {
+        class: rawActionGroups[i].class,
+        actions: []
+      };
+      for (var j = 0; j < actionGroup.actions.length; ++j) {
+        ele.actions.push(new ActionItem(actionGroup.actions[j]));
+      }
+      result.push(ele);
+    }
+    return result;
+  }
+
   // private - Update state to reflect a valid response from server.
   function handleAResults(self, results) {
     self.responseCount += 1;
@@ -52,21 +83,18 @@ function($,        Cookie,        HttpMethod,        Observable,      ActionItem
     if (results.user) {
       self.user = results.user;
     }
-
     self.user && self.user.name ? startPolling(self) : stopPolling(self);
 
-    var actionItems = results.actionItems;
-    if (actionItems) {
-      // TODO: do differencing
-      for (var i = 0; i < actionItems.length; ++i) {
-        actionItems[i] = new ActionItem(actionItems[i]);
-      }
-      self.actionItems.value = actionItems;
-      notifyActionListeners(self);
-    }
+    var rawActionGroups = results.actionGroups;
 
-    // Then trigger handlers that observe the model.
-    notifyStateChangeListeners(self);
+    if (!self.rawActionGroups || !rawActionGroups ||
+      !equalActionGroups(rawActionGroups, self.rawActionGroups)) {
+      self.actionGroups = wrapModel(rawActionGroups);
+      // Then trigger handlers that observe the model.
+      notifyActionListeners(self);
+      notifyStateChangeListeners(self);
+    }
+    results.rawActionGroups = rawActionGroups;
   }
 
   // private - Update state to reflect an error, either network or backend.
@@ -179,9 +207,6 @@ function($,        Cookie,        HttpMethod,        Observable,      ActionItem
 
     // The session manager notifies listeners of general state changes.
     self.state = new Observable(self);
-
-    // The session manager maintains the current list of action items, and notifies
-    // listeners of changes.
     self.actionItems = new Observable([]);
   }
 

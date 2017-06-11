@@ -40,30 +40,24 @@ define([ "jquery", "ui/index", "services" ], function($, ui, Services) {
         })
     }
 
-    function render(self, actionItems) {
-      var container = self.container.empty()      // TODO: render incrememtally.
-      var lastBatch = self.lastBatch;
-      var newBatch = {};
+    function render(self) {
+      var uniqueActionItem;
       cancelLaunchTimeout(self);
-      if (actionItems) {
-        for (var i = 0; i < actionItems.length; ++i) {
-          var actionItem = actionItems[i];
-          var itemView = renderItem(self, actionItem).appendTo(container);
-          /***
-          if (lastBatch && !(actionItem.id in lastBatch)) {
-            itemView.addClass("new");
-            if (self.chime) {
-              self.chime.play();
-            }
+      var actionGroups = Services.sessionManager.actionGroups;
+      self.ele.empty();
+      if (actionGroups) {
+        for (var i = 0; i < actionGroups.length; ++i) {
+          var actionGroup = actionGroups[i];
+          for (var j = 0; j < actionGroup.actions.length; ++j) {
+            var actionItem = actionGroup.actions[j];
+            uniqueActionItem = uniqueActionItem ? null : actionItem;
+            var itemView = renderItem(self, actionItem).appendTo(self.ele);
           }
-          ***/
-          newBatch[actionItem.id] = actionItem;
-        }
-        if (actionItems.length == 1) {
-          startLaunchTimeout(self, actionItems[0]);
         }
       }
-      self.lastBatch = newBatch;
+      if (uniqueActionItem) {
+        startLaunchTimeout(self, uniqueActionItem);
+      }
     }
 
     c.defineInitializer(function() {
@@ -73,7 +67,7 @@ define([ "jquery", "ui/index", "services" ], function($, ui, Services) {
         self.container.append(chime.container);
         self.chime = chime;
       });
-      render(self, Services.sessionManager.actionItems.value);
+      render(self);
     });
 
     c.extendPrototype({
@@ -81,8 +75,8 @@ define([ "jquery", "ui/index", "services" ], function($, ui, Services) {
         var self = this;
         if (!self.isOpen) {
           self.isOpen = true;
-          self.closeHandle = Services.sessionManager.addActionListener(function(actionItems) {
-            render(self, actionItems);
+          self.closeHandle = Services.sessionManager.addActionListener(function() {
+            render(self);
           });
         }
         return this;

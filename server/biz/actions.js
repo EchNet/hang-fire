@@ -15,9 +15,9 @@ function forEach(arrayOrHash, callback) {
 function ActionCompiler(user) {
   this.user = user;
   this.actionGroups = [
-    { priority: 0, actions: [] },
-    { priority: 1, actions: [] },
-    { priority: 2, actions: [] }
+    { priority: 0, "class": "inbox", actions: [] },
+    { priority: 1, "class": "contacts", actions: [] },
+    { priority: 2, "class": "other", actions: [] }
   ];
 }
 
