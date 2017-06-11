@@ -11,6 +11,9 @@ function expector(response, body) {
   return {
 
     expectStatusCode: function(expectedStatusCode) {
+      if (expectedStatusCode == 200 && response.statusCode != 200) {
+        console.log(body);
+      }
       expect(response.statusCode).to.equal(expectedStatusCode);
       return this;
     },
@@ -133,6 +136,10 @@ function wipe() {
   .then(function(expector) {
     expector.expectStatusCode(200);
     return makeRequest("DELETE", "/api/reminders").asRoot().go();
+  })
+  .then(function(expector) {
+    expector.expectStatusCode(200);
+    return makeRequest("DELETE", "/assets").asRoot().go();
   })
   .then(function(expector) {
     expector.expectStatusCode(200);

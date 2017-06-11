@@ -3,20 +3,47 @@ const requestlc = require("./common/requestlc");
 
 requestlc.describe("Messages API", function(client) {
 
+  var theUser1, theUser2;
+  var asset;
+
+  beforeEach(function(done) {
+    client.makeRequest("POST", "/api/profile").asRoot().withData({
+      assetId: 1,
+      name: "User 1"
+    }).getJson().then(function(user) {
+      theUser1 = user;
+      return client.makeRequest("POST", "/api/profile").asRoot().withData({
+        assetId: 2,
+        name: "User 2"
+      }).getJson();
+    }).then(function(user) {
+      theUser2 = user;
+      return client.makeRequest("POST", "/assets").asRoot().withData({
+        userId: theUser1.id,
+        mime: "video/webm",
+        key: "123",
+        url: "456"
+      });
+    }).then(function(_asset) {
+      asset = _asset;
+      done();
+    })
+    .catch(done);
+  });
+
   describe("get method", function() {
 
-    var fromUserId = 3;
-
-    var seedProperties = {
-      assetId: 5,
-      toUserId: 4,
-      type: 1
-    };
+    var seedProperties;
 
     var goodMessageId;
 
     beforeEach(function(done) {
-      client.makeRequest("POST", "/api/messages").asUser(fromUserId).withData(seedProperties) 
+      seedProperties = {
+        assetId: 5,
+        toUserId: theUser2.id,
+        type: 1
+      };
+      client.makeRequest("POST", "/api/messages").asUser(theUser1.id).withData(seedProperties) 
       .getJson()
       .then(function(message) {
         goodMessageId = message.id;
@@ -58,7 +85,7 @@ requestlc.describe("Messages API", function(client) {
     })
 
     it("does not permit just anyone to retrieve message", function(done) {
-      get(goodMessageId).asUser(fromUserId * 2).go()
+      get(goodMessageId).asUser(theUser1.id * 2).go()
       .then(function(expector) {
         expector.expectStatusCode(401);
         done();
@@ -67,7 +94,7 @@ requestlc.describe("Messages API", function(client) {
     })
 
     it("allows sender to retrieve message", function(done) {
-      get(goodMessageId).asUser(fromUserId).getJson()
+      get(goodMessageId).asUser(theUser1.id).getJson()
       .then(function(message) {
         expect(message.assetId).to.equal(seedProperties.assetId);
         expect(message.toUserId).to.equal(seedProperties.toUserId);
@@ -93,9 +120,9 @@ requestlc.describe("Messages API", function(client) {
 
     it("defaults to greeting type", function(done) {
       post({
-        assetId: 1,
-        toUserId: 1
-      }).asUser(12).getJson()
+        assetId: 22,
+        toUserId: theUser1.id
+      }).asUser(theUser2.id).getJson()
       .then(function(message) {
         expect(message.type).to.equal(0);
         done();
@@ -115,7 +142,7 @@ requestlc.describe("Messages API", function(client) {
       .catch(done);
     })
 
-    it("ordinary users may not post announcements", function(done) {
+    it("announcements may not be posted without admin auth", function(done) {
       post({
         type: 3,
         assetId: 1

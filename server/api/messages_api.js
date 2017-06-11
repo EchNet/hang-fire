@@ -4,6 +4,7 @@ const Message = require("../models/index").Message;
 const Connection = require("../models/index").Connection;
 const ApiValidator = require("./api_validator");
 const Promise = require("promise");
+const MessageBiz = require("../biz/messages");
 
 const DEFAULT_ANNOUNCEMENT_DURATION = 14*24*60*60*1000;   // 14 days
 
@@ -77,41 +78,10 @@ router.post("/", function(req, res) {
     if (!req.user) {
       throw { status: 401 };
     }
-
     var fields = VALIDATOR.validateNew(req.body);
-    fields.fromUserId = req.user.id;
-    
-    // TODO: validate asset.
-
-    // Validate toUserId.
-    var toUserId = fields.toUserId;
-    var personal = false;
-    switch (fields.type) {
-    case Message.GREETING_TYPE:
-    case Message.INVITE_TYPE:
-      personal = true;
-    }
-    if ((toUserId == null) == personal) {
-      throw { body: { toUserId: toUserId || "?" }};
-    }
-
-    // TODO: validate toUser.
-
-    switch (fields.type) {
-    case Message.ANNOUNCEMENT_TO_ALL_TYPE:
-    case Message.ANNOUNCEMENT_TO_NEW_TYPE:
-      if (!req.isAdmin) {
-        throw { status: 401 };
-      }
-      if (!fields.startDate) {
-        fields.startDate = new Date();
-      }
-      if (!fields.endDate) {
-        fields.endDate = new Date(fields.startDate.getTime() + 30*24*60*60*1000);
-      }
-    }
-
-    resolve(Message.create(fields));
+    resolve(MessageBiz.createMessage(req.user, fields).then(function(memo) {
+      return memo.message;
+    }));
   }))
 });
 
