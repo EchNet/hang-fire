@@ -51,15 +51,17 @@ define([ "jquery", "ui/index", "services" ], function($, ui, Services) {
           var actionGroup = actionGroups[i];
           var div = $("<div>").addClass("actionGroup").appendTo(self.ele);
           var headerText = null;
-          switch (actionGroup.class) {
-          case "contacts":
-            headerText = "Your connections";
-            break;
-          case "inbox":
-            headerText = "Your new videograms";
-            break;
-          case "other":
-            headerText = "More";
+          if (actionGroups.length > 1) {
+            switch (actionGroup.class) {
+            case "contacts":
+              headerText = "Your connections";
+              break;
+            case "inbox":
+              headerText = "Your new videograms";
+              break;
+            case "other":
+              headerText = "More";
+            }
           }
           if (headerText) {
             div.append($("<div>").addClass("header")
