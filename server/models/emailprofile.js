@@ -67,8 +67,8 @@ module.exports = function(sequelize, DataTypes) {
     return EmailProfile.findAll(query({ userId: userId }, options));
   }
 
-  function findByUser(user) {
-    return findByUserId(user.id);
+  function findByUser(user, options) {
+    return findByUserId(user.id, options);
   }
 
   function destroyWhere(where) {

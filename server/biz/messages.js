@@ -1,11 +1,17 @@
 /* biz/messages.js */
 
+const CONF = require("../conf");
+
+const Promise = require("promise");
+const models = require("../models/index");
+const Asset = models.Asset;
+const Message = models.Message;
+const User = models.User;
+const EmailProfile = models.EmailProfile;
+const emailer = require("../connectors/email");
+const pug = require("pug");
+
 module.exports = (function() {
-  const Promise = require("promise");
-  const models = require("../models/index");
-  const Asset = models.Asset;
-  const Message = models.Message;
-  const User = models.User;
 
   function isPersonalType(type) {
     switch (type) {
@@ -15,6 +21,32 @@ module.exports = (function() {
     default:
       return false;
     }
+  }
+
+  var gotMailFunction = pug.compileFile("templates/gotmail.pug", CONF.pug);
+
+  // Generate the email message and send it.
+  // Return a promise.
+  function sendGotMail(fromUser, toUser) {
+    return EmailProfile.findByUser(toUser)
+    .then(function(emailProfiles) {
+      if (emailProfiles.length) {
+        var toEmailProfile = emailProfiles[0];
+        return emailer.send({
+          from: "Do not reply <do-not-reply@livingcx.com>",
+          to: toEmailProfile.email,
+          subject: "You have a new videogram",
+          html: gotMailFunction({
+            toUser: toUser,
+            fromUser: fromUser,
+            url: "http://livingcx.com/"
+          })
+        });
+      }
+    }).then(function() {
+    }).catch(function(e) {
+      console.error(e);
+    });
   }
   
   function createMessage(fromUser, fields) {
@@ -60,16 +92,21 @@ module.exports = (function() {
           throw { body: { toUserId: fields.toUserId } }
         }
         toUser = _toUser;
-
         // Create message; include sender in fields.
         fields.fromUserId = fromUser.id;
         return Message.create(fields);
       }).then(function(message) {
+        if (isPersonalType(fields.type)) {
+          sendGotMail(fromUser, toUser);
+        }
+
         resolve({
           asset: asset,
           toUser: toUser,
           message: message
         });
+
+        return null; // quiet warning
       }).catch(function(error) {
         reject(error);
       });
