@@ -71,7 +71,7 @@ function(ui,         When ) {
 
     c.defineProperty("description", {
       get: function() {
-        return "From " + this.sender + " at " + this.when;
+        return "From " + this.sender + " " + this.when;
       }
     });
 

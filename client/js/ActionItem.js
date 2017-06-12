@@ -89,7 +89,7 @@ define([ "jquery", "Asset", "util/When" ], function($, Asset, When) {
         else {
           txt = "last message from " + (msg.fromUserId == data.user.id ? data.user.name : "you");
         }
-        txt += " at " + when(msg);
+        txt += " " + when(msg);
         return span(txt);
       }
       break;

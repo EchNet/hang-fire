@@ -30,11 +30,11 @@ define([], function() {
   ]
 
   var DATE_FORMATS = {
-    DAYS_AGO:  "{4} {6}:{7}{8}",
-    LONG_AGO:  "{0}/{1}/{3} {6}:{7}{8}",
-    THIS_YEAR: "{0} {2}, {6}:{7}{8}",
-    TODAY:     "{6}:{7}{8}",
-    YESTERDAY: "yesterday {6}:{7}{8}",
+    DAYS_AGO:  "{4} at {6}:{7}{8}",
+    LONG_AGO:  "{0}/{1}/{3} at {6}:{7}{8}",
+    THIS_YEAR: "{0} {2}, at {6}:{7}{8}",
+    TODAY:     "at {6}:{7}{8}",
+    YESTERDAY: "yesterday at {6}:{7}{8}",
     DEFAULT:   "{0} {2} {3}"
   }
 
