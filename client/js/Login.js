@@ -6,15 +6,18 @@ function($,        ui,         FacebookButton, WaitAnim,   Services) {
   var EmailForm = ui.Component.defineClass(function(c) {
 
     function submit(self, text) {
+      self.sendButton.enabled = false;
+      self.emailInput.enabled = false;
+      self.fbButton.enabled = false;
       Services.sessionManager.requestEmailTicket(text)
       .then(function() {
-        self.messageBox.text = "Login link sent to your email box.  You may close this window.";
-        self.sendButton.enabled = false;
-        self.emailInput.enabled = false;
-        self.fbButton.enabled = false;
+        self.invokePlugin("openEmailSent");
       })
       .catch(function(e) {
         self.messageBox.text = "Can't reach the server. Please try again.";
+        self.sendButton.enabled = true;
+        self.emailInput.enabled = true;
+        self.fbButton.enabled = true;
       })
     }
 
@@ -39,7 +42,7 @@ function($,        ui,         FacebookButton, WaitAnim,   Services) {
         self.invokePlugin("openFacebookForm");
       });
 
-      var sendButton = ui.Button.create("Send request", function() {
+      var sendButton = ui.Button.create("OK", function() {
         emailInput.submit();
       });
 
@@ -48,12 +51,12 @@ function($,        ui,         FacebookButton, WaitAnim,   Services) {
       self.ele
         .append($("<div>").addClass("big").addClass("chunk")
           .text("Log in to Living Connections"))
-        .append($("<div>").addClass("chunk")
-          .append(fbButton.ele.addClass("useFb")))
-        .append($("<div>").addClass("big").addClass("chunk")
-          .text("OR"))
+        //.append($("<div>").addClass("chunk")
+          //.append(fbButton.ele.addClass("useFb")))
+        //.append($("<div>").addClass("big").addClass("chunk")
+          //.text("OR"))
         .append($("<div>").addClass("form")
-          .append($("<div>").text("Use your email address to log in:"))
+          .append($("<div>").text("Please enter your email address:"))
           .append($("<div>").addClass("indent")
             .append($("<div>").addClass("prompt")
               .text("EMAIL ADDRESS"))
@@ -62,8 +65,7 @@ function($,        ui,         FacebookButton, WaitAnim,   Services) {
             .append($("<div>")
               .append(sendButton.ele.addClass("sendEmail")))
           )
-        )
-        .append(messageBox.ele.addClass("chunk").addClass("message"));
+        );
 
       self.messageBox = messageBox;
       self.emailInput = emailInput;
@@ -79,6 +81,20 @@ function($,        ui,         FacebookButton, WaitAnim,   Services) {
           self.emailInput.focus();
         }, 100);
       }
+    });
+  });
+
+  var EmailSent = ui.Component.defineClass(function(c) {
+
+    c.defineInitializer(function() {
+      var self = this;
+      self.ele
+        .append($("<div>").addClass("big").addClass("chunk")
+          .text("Log in to Living Connections"))
+        .append($("<div>").addClass("chunk")
+          .text("We have just sent a link, usable any time within the next 24 hours, to your email address. Go to your email and click the link to log in to Living Connections."))
+        .append($("<div>").addClass("chunk")
+          .text("You may close this window."))
     });
   });
 
@@ -178,6 +194,7 @@ function($,        ui,         FacebookButton, WaitAnim,   Services) {
   return ui.Component.defineClass(function(c) {
 
     var EMAIL = "email";
+    var EMAIL_SENT = "emailSent";
     var FB = "facebook";
 
     c.defineInitializer(function() {
@@ -186,6 +203,7 @@ function($,        ui,         FacebookButton, WaitAnim,   Services) {
         cssClass: "body",
         initialState: EMAIL
       }).addCompartment(EMAIL, new EmailForm().addPlugin(self))
+        .addCompartment(EMAIL_SENT, new EmailSent().addPlugin(self))
         .addCompartment(FB, new FacebookForm().addPlugin(self));
       self.ele
         .append($("<div>").addClass("header"))
@@ -205,6 +223,9 @@ function($,        ui,         FacebookButton, WaitAnim,   Services) {
       },
       openEmailForm: function() {
         return this.carton.show(EMAIL);
+      },
+      openEmailSent: function() {
+        return this.carton.show(EMAIL_SENT);
       }
     });
   });

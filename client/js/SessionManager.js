@@ -85,9 +85,9 @@ function($,        Cookie,        HttpMethod,        Observable,      ActionItem
     }
     self.user && self.user.name ? startPolling(self) : stopPolling(self);
 
-    var rawActionGroups = results.actionGroups;
+    var rawActionGroups = results.actionGroups || [];
 
-    if (!self.rawActionGroups || !rawActionGroups ||
+    if (!self.rawActionGroups || 
       !equalActionGroups(rawActionGroups, self.rawActionGroups)) {
       self.actionGroups = wrapModel(rawActionGroups);
       // Then trigger handlers that observe the model.
