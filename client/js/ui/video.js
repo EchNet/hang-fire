@@ -11,7 +11,8 @@ define([ "jquery", "ui/button", "ui/component", "ui/sizegoal" ], function($, But
     c.defineDefaultOptions({
       cssClass: "video",
       initialWidth: 40,
-      initialHeight: 40
+      initialHeight: 40,
+      useCustomControls: false
     });
 
     function setSize($ele, width, height) {
@@ -85,7 +86,7 @@ define([ "jquery", "ui/button", "ui/component", "ui/sizegoal" ], function($, But
       self.controls.ele
         .append(self.restartButton.ele)
         .append(self.progressBar.ele)
-        .append(self.fullScreenButton.ele)
+        .append(self.fullScreenButton.ele) // disable full-screen for now
     }
 
     // The outer element is usually a div.  The div contains two elements: the video and a container
@@ -93,9 +94,13 @@ define([ "jquery", "ui/button", "ui/component", "ui/sizegoal" ], function($, But
     c.defineInitializer(function() {
       var self = this;
       initControls(self);
-      self.ele
-        .append(self.playOverlay.ele)
-        .append(self.controls.ele);
+      self.ele.append(self.playOverlay.ele);
+      if (self.options.useCustomControls) {
+        self.ele.append(self.controls.ele);
+      }
+      else {
+        self.videoElement.controls = true;
+      }
       setSize(self.$videoElement, self.options.initialWidth, self.options.initialHeight);
     });
 
