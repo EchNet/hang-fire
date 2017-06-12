@@ -12,7 +12,7 @@ define([ "jquery", "ui/button", "ui/component", "ui/sizegoal" ], function($, But
       cssClass: "video",
       initialWidth: 40,
       initialHeight: 40,
-      useCustomControls: false
+      useCustomControls: true
     });
 
     function setSize($ele, width, height) {
@@ -50,15 +50,22 @@ define([ "jquery", "ui/button", "ui/component", "ui/sizegoal" ], function($, But
       function showProgress() {
         var video = self.videoElement;
         var currentTime = video.currentTime || 0;
-        var duration = video.duration || 5;
-        var percentage = Math.floor((100 / duration) * currentTime);
+        var duration = isFinite(video.duration) ? video.duration : 5;
+        var percentage = Math.min(100, Math.floor((100 / duration) * currentTime));
         self.progressBar.ele.val(percentage);
-        self.restartButton.enabled = currentTime > 0;
       }
 
       function restart() {
+        var video = self.videoElement;
+        video.currentTime = 0;
+        if (video.paused) {
+          video.play();
+        }
+        showProgress();
+      }
+
+      function postMortem() {
         self.videoElement.currentTime = 0;
-        self.playOverlay.visible = true;
         showProgress();
       }
 
@@ -79,14 +86,14 @@ define([ "jquery", "ui/button", "ui/component", "ui/sizegoal" ], function($, But
       video.addEventListener("click", playOrPause);
       video.addEventListener("playing", showPlaying);
       video.addEventListener("pause", showPaused);
-      video.addEventListener("ended", restart);
+      video.addEventListener("ended", postMortem);
       video.addEventListener("timeupdate", showProgress);
 
       self.controls = new Component("<div class='controls'>");
       self.controls.ele
         .append(self.restartButton.ele)
         .append(self.progressBar.ele)
-        .append(self.fullScreenButton.ele) // disable full-screen for now
+        .append(self.fullScreenButton.ele)
     }
 
     // The outer element is usually a div.  The div contains two elements: the video and a container
