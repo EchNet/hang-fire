@@ -290,11 +290,11 @@ div.video .overlay {
   background-size: contain;
   background-position: center;
   opacity: .5;
-	-webkit-transition: opacity .3s;
-	-moz-transition: opacity .3s;
-	-o-transition: opacity .3s;
-	-ms-transition: opacity .3s;
-	transition: opacity .3s;
+  -webkit-transition: opacity .3s;
+  -moz-transition: opacity .3s;
+  -o-transition: opacity .3s;
+  -ms-transition: opacity .3s;
+  transition: opacity .3s;
   cursor: pointer;
 }
 div.video .controls {
@@ -394,4 +394,14 @@ span.hilite {
 .subtle {
   font-style: italic;
   font-size: 12px;
+}
+.actionGroup {
+  margin-top: 10px;
+  border-top: 1px;
+}
+.actionGroup div {
+  display: inline-block;
+}
+.actionGroup div.header {
+  width: 100%;
 }

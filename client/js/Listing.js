@@ -41,22 +41,40 @@ define([ "jquery", "ui/index", "services" ], function($, ui, Services) {
     }
 
     function render(self) {
-      var uniqueActionItem;
+      var firstActionItem;
+      var actionItemCount = 0;
       cancelLaunchTimeout(self);
       var actionGroups = Services.sessionManager.actionGroups;
       self.ele.empty();
       if (actionGroups) {
         for (var i = 0; i < actionGroups.length; ++i) {
           var actionGroup = actionGroups[i];
+          var div = $("<div>").addClass("actionGroup").appendTo(self.ele);
+          var headerText = null;
+          switch (actionGroup.class) {
+          case "contacts":
+            headerText = "Your connections";
+            break;
+          case "inbox":
+            headerText = "Your new videograms";
+            break;
+          case "other":
+            headerText = "More";
+          }
+          if (headerText) {
+            div.append($("<div>").addClass("header")
+              .append($("<small>").text(headerText))
+            );
+          }
           for (var j = 0; j < actionGroup.actions.length; ++j) {
             var actionItem = actionGroup.actions[j];
-            uniqueActionItem = uniqueActionItem ? null : actionItem;
-            var itemView = renderItem(self, actionItem).appendTo(self.ele);
+            firstActionItem = firstActionItem || actionItem;
+            renderItem(self, actionItem).appendTo(div);
           }
         }
       }
-      if (uniqueActionItem) {
-        startLaunchTimeout(self, uniqueActionItem);
+      if (actionItemCount == 1) {
+        startLaunchTimeout(self, firstActionItem);
       }
     }
 
