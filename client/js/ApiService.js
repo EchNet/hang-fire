@@ -163,6 +163,13 @@ define([ "util/HttpMethod" ], function(HttpMethod) {
     .addQueryParameter("assetId")
     .build();
 
+  var LogEventMethod = new HttpMethod.PostForm()
+    .addPathComponent("/api/events")
+    .addQueryParameter("type")
+    .addQueryParameter("messageId")
+    .addQueryParameter("clientTime")
+    .build();
+
   ApiService.prototype = {
 
     saveVideo: function(blob) {
@@ -200,6 +207,14 @@ define([ "util/HttpMethod" ], function(HttpMethod) {
 
     updateProfile: function(assetId) {
       return new UpdateProfileMethod().setAssetId(assetId).execute();
+    },
+
+    logEvent: function(props) {
+      return new LogEventMethod()
+        .setMessageId(props.messageId)
+        .setType(props.type)
+        .setClientTime(new Date().toISOString())
+        .execute();
     }
   }
 

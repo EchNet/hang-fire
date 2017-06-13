@@ -42,6 +42,11 @@ function($,        Activity,     ui,       ActionItem,   Services,   VideoRecord
           .addPlugin({ onClick: toReplyState });
       }
 
+      function logView(message) {
+        console.log('logging view', message);
+        Services.apiService.logEvent({ type: 'view', messageId: message.id });
+      }
+
       self.playerView.append(makeMessageOptions());
 
       for (var i = 0; i < thread.length; ++i) {
@@ -55,6 +60,9 @@ function($,        Activity,     ui,       ActionItem,   Services,   VideoRecord
           }).addPlugin({
             requestMaximize: function() {
               requestMaximize(i);
+            },
+            notifyView: function() {
+              logView(message);
             }
           });
           self.playerView.append(messageView);

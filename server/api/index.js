@@ -15,6 +15,7 @@ router.use(function(req, res, next) {
 
 router.use("/connections", require("./connections_api"));
 router.use("/emailprofiles", require("./email_profiles_api"));
+router.use("/events", require("./events_api"));
 router.use("/invites", require("./invites_api"));
 router.use("/messages", require("./messages_api"));
 router.use("/profile", require("./profile_api"));

@@ -53,6 +53,11 @@ define([ "jquery", "ui/button", "ui/component", "ui/sizegoal" ], function($, But
         var duration = isFinite(video.duration) ? video.duration : 5;
         var percentage = Math.min(100, Math.floor((100 / duration) * currentTime));
         self.progressBar.ele.val(percentage);
+
+        if ((currentTime >= 2 || percentage >= 100) && !self.viewNotified) {
+          self.viewNotified = true;
+          self.invokePlugin("notifyView");
+        }
       }
 
       function restart() {

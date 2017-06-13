@@ -46,11 +46,26 @@ function getAnnouncements(miner) {
 
 function makeThreadGetter(userId, other) {
   return function() {
+    var lastReceived = null;
+
     return models.Message.findThread(userId, other.user.id, {
       limit: 5
     })
     .then(function(thread) {
       other.thread = thread;
+      for (var i = 0; i < thread.length; ++i) {
+        if (thread[i].toUserId == userId) {
+          lastReceived = thread[i];
+          return models.UserMessageEvent.anyUserMessageView(userId, lastReceived.id);
+        }
+      }
+      return null;
+    })
+    .then(function(view) {
+      if (lastReceived && !view) {
+        other.unreadMessage = lastReceived;
+      }
+      return null;
     });
   };
 }

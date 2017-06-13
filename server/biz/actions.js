@@ -70,20 +70,14 @@ function createActionItems(compiler) {
 
     forEach(compiler.others, function(other) {
       var thread = other.thread || [];
-      var id = "con-new";
       var data = {
         user: other.user,
         thread: thread
       };
-      if (thread.length) {
-        if (thread[0].fromUserId == other.user.id && thread[0].type == Message.GREETING_TYPE) {
-          addActionItem(0, createActionItem("con-in", data));
-        }
-        else {
-          id = "con-out";
-        }
+      if (other.unreadMessage) {
+        addActionItem(0, createActionItem("con-in", data));  // TODO: indicate the unread message
       }
-      addActionItem(1, createActionItem(id || "con-new", data));
+      addActionItem(1, createActionItem(thread.length == 1 && thread[0].type != Message.GREETING_TYPE ? "con-new" : "con-out", data));
     });
 
     forEach(compiler.outgoingInvitations, function(inv) {

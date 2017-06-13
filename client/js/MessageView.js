@@ -14,7 +14,7 @@ function(ui,         When ) {
           self.invokePlugin("requestMaximize");
         }
       });
-      self.videoPlayer = new ui.Video().setVisible(false); 
+      self.videoPlayer = new ui.Video().setVisible(false).addPlugin(self); 
       var descrElement = new ui.Component({ cssClass: "subtle" }).setText(self.description);
       self.append(self.thumb).append(self.videoPlayer).append(descrElement);
 
@@ -102,6 +102,9 @@ function(ui,         When ) {
           this.minimized = false;
         }
         return this;
+      },
+      notifyView: function() {
+        this.invokePlugin("notifyView");
       }
     });
   });
