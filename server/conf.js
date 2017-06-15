@@ -75,7 +75,8 @@ const OVERRIDES = {
       }
     },
     auth: {
-      enableExtHeaderAccess: true
+      enableExtHeaderAccess: true,
+      enableAccessByUserId: true
     },  
     clientServiceConfigurations: {
       sessionManager: {

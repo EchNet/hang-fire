@@ -114,18 +114,23 @@ function extHeaderAccessEnabled(self) {
   return CONFIG.auth.enableExtHeaderAccess && self.req.headers["x-access-key"] === CONFIG.adminKey;
 }
 
+function pseudoLogIn(self, userId) {
+  return models.User.findById(userId)
+  .then(function(user) {
+    setUser(self, user || {
+      id: parseInt(userId),
+      name: "Test",
+      level: 1
+    });
+    //console.log("Assumed identity of user:", userId);
+    return null;
+  })
+}
+
 function extHeaderLogin(self) {
   var effectiveUserId = self.req.headers["x-effective-user"];
   if (effectiveUserId) {
-    return models.User.findById(effectiveUserId)
-    .then(function(user) {
-      setUser(self, user || {
-        id: parseInt(effectiveUserId),
-        name: "Test",
-        level: 1
-      });
-      //console.log("Assumed identity of user for testing:", effectiveUserId);
-    })
+    return pseudoLogIn(self, effectiveUserId);
   }
   else {
     self.req.isAdmin = true;
@@ -135,6 +140,16 @@ function extHeaderLogin(self) {
 
 // If the request includes session identification, fetch the session and user objects.
 function AuthMgr_establishSessionAndUser(self) {
+  if (CONFIG.auth.enableAccessByUserId && self.req.query.user != null) {
+    return models.User.findById(self.req.query.user)
+    .then(function(user) {
+      if (user) {
+        return AuthMgr_logIn(self, user);
+      }
+      throw { status: 500 }
+    });
+  }
+
   // Sessions are persisted via cookie.
   var sessionCookie = self.req.cookies && self.req.cookies.s;
 
@@ -204,58 +219,7 @@ function AuthMgr_resolveTicket(self, eseed) {
 
 // I want to identify myself through Facebook.
 function AuthMgr_handleFacebookLogin(self, facebookId, otherFacebookInfo) {
-  return models.FacebookProfile.upsert({
-    facebookId: facebookId,
-    name: otherFacebookInfo.name,
-    email: otherFacebookInfo.email,
-    picture: otherFacebookInfo.picture
-  })
-  .then(function() {
-    return models.FacebookProfile.findByFacebookId(facebookId);
-  })
-  .then(function(facebookProfile) {
-    var currentUser = self.req.session && self.req.session.user;
-
-    // Is there a user associated with this profile?
-    if (facebookProfile.userId != null) {
-      // If so, and it matches the already logged-in user, carry on.
-      if (!currentUser || facebookProfile.userId != currentUser.id) {
-        // Otherwise, start a new session with the user identified by the profile.
-        return findUser(facebookProfile.userId)
-        .then(function(user) {
-          return AuthMgr_logIn(self, user);
-        });
-      }
-    }
-    else {
-      // This is a new profile.  If there is a user logged in...
-      if (currentUser) {
-        // If the user already has a facebook profile, log them out.
-        if (currentUser.facebookProfile) {
-          logOut(self.req);
-          currentUser = null;
-        }
-        // Otherwise, associate the new profile with the current user.
-        else {
-          return facebookProfile.updateAttributes({
-            userId: currentUser.id
-          });
-        }
-      }
-      // Create a new user with the given profile and log them in.
-      return createNewUser(facebookProfile.name || facebookProfile.email || "")
-      .then(function(user) {
-        currentUser = user;
-        return facebookProfile.updateAttributes({
-          userId: user.id
-        })
-      })
-      .then(function() {
-        return AuthMgr_logIn(self, currentUser);
-      });
-    }
-    return null;   // avoid dangling promise warnings
-  });
+  // Not implemented - requires OAuth.
 }
 
 AuthMgr.prototype = {
