@@ -44,8 +44,9 @@ define([ "jquery", "Asset", "util/When" ], function($, Asset, When) {
       return span("Make an announcement");
     case "ann-upd":
       return span("Update announcement");
+    case "gre-in":
+      return span().append(span("New videogram from ")).append(hilite(data.user.name || ("User " + data.user.id)));
     case "con-new":
-    case "con-in":
     case "con-out":
       return hilite(data.user.name || ("User " + data.user.id));
     case "inv-rec":
@@ -76,6 +77,7 @@ define([ "jquery", "Asset", "util/When" ], function($, Asset, When) {
     switch (aspect) {
     case "rec":
     case "in":
+      if (topic == "gre") return span(when(data.message));
     case "out":
       if (data.invite) {
         return span("from " + data.invite.fromUser.name);

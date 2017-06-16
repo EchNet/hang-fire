@@ -43,7 +43,6 @@ function($,        Activity,     ui,       ActionItem,   Services,   VideoRecord
       }
 
       function logView(message) {
-        console.log('logging view', message);
         Services.apiService.logEvent({ type: 'view', messageId: message.id });
       }
 

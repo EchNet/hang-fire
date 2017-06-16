@@ -261,9 +261,15 @@ div.messageView {
   padding-bottom: 4px;
   border-bottom: dashed 1px #ddd;
 }
-div.videoPlayer {
-  margin: auto;
+.messageViewer {
   position: relative;
+}
+.messageViewer .video {
+  position: absolute;
+  width: 100%;
+}
+.messageViewer .overlay {
+  position: absolute;
 }
 div.video {
   position: relative;
@@ -298,7 +304,7 @@ div.video .overlay {
   cursor: pointer;
 }
 div.video .controls {
-  padding: 2px 40px;
+  padding: 2px 8px 2px 40px;
   position: relative;
 }
 div.video button {
@@ -312,7 +318,7 @@ div.video button {
 }
 div.video button.restart {
   position: absolute;
-  left: 0px;
+  left: 4px;
   background-image: url(/img/restartbutton.png);
 }
 div.video button.fullScreen {
@@ -325,8 +331,9 @@ div.video progress {
   width: 100%;
 }
 video {
-  object-fit: contain;
-  object-position: 50% 50%;
+  #object-fit: contain;
+  #object-position: 50% 50%;
+  width: 100%;
   cursor: pointer;
 }
 #app .activity .panel {

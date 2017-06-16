@@ -69,15 +69,16 @@ function createActionItems(compiler) {
     });
 
     forEach(compiler.others, function(other) {
-      var thread = other.thread || [];
-      var data = {
-        user: other.user,
-        thread: thread
-      };
       if (other.unreadMessage) {
-        addActionItem(0, createActionItem("con-in", data));  // TODO: indicate the unread message
+        addActionItem(0, createActionItem("gre-in", {
+          user: other.user,
+          message: other.unreadMessage
+        }));
       }
-      addActionItem(1, createActionItem(thread.length == 1 && thread[0].type != Message.GREETING_TYPE ? "con-new" : "con-out", data));
+      addActionItem(1, createActionItem(other.thread.length == 1 && other.thread[0].type != Message.GREETING_TYPE ? "con-new" : "con-out", {
+        user: other.user,
+        thread: other.thread || []
+      }));
     });
 
     forEach(compiler.outgoingInvitations, function(inv) {

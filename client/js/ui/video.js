@@ -10,9 +10,11 @@ define([ "jquery", "ui/button", "ui/component", "ui/sizegoal" ], function($, But
 
     c.defineDefaultOptions({
       cssClass: "video",
-      initialWidth: 40,
-      initialHeight: 40,
-      useCustomControls: true
+      initialWidth: null,
+      initialHeight: null,
+      useCustomControls: true,
+      useOriginalSize: false,
+      showFullScreenButton: false
     });
 
     function setSize($ele, width, height) {
@@ -50,7 +52,7 @@ define([ "jquery", "ui/button", "ui/component", "ui/sizegoal" ], function($, But
       function showProgress() {
         var video = self.videoElement;
         var currentTime = video.currentTime || 0;
-        var duration = isFinite(video.duration) ? video.duration : 5;
+        var duration = isFinite(video.duration) ? video.duration : 10;
         var percentage = Math.min(100, Math.floor((100 / duration) * currentTime));
         self.progressBar.ele.val(percentage);
 
@@ -98,7 +100,10 @@ define([ "jquery", "ui/button", "ui/component", "ui/sizegoal" ], function($, But
       self.controls.ele
         .append(self.restartButton.ele)
         .append(self.progressBar.ele)
-        .append(self.fullScreenButton.ele)
+
+      if (self.options.showFullScreenButton) {
+        self.controls.ele.append(self.fullScreenButton.ele)
+      }
     }
 
     // The outer element is usually a div.  The div contains two elements: the video and a container
@@ -113,7 +118,9 @@ define([ "jquery", "ui/button", "ui/component", "ui/sizegoal" ], function($, But
       else {
         self.videoElement.controls = true;
       }
-      setSize(self.$videoElement, self.options.initialWidth, self.options.initialHeight);
+      if (self.options.initialWidth != null && self.options.initialHeight != null) {
+        setSize(self.$videoElement, self.options.initialWidth, self.options.initialHeight);
+      }
     });
 
     c.extendPrototype({
@@ -123,21 +130,23 @@ define([ "jquery", "ui/button", "ui/component", "ui/sizegoal" ], function($, But
         var promise = $.Deferred();
         var theVideo = self.videoElement;
         var srcIsUrl = typeof src == "string";
-
-        if (srcIsUrl) {
-          setSize(self.$videoElement, self.options.initialWidth, self.options.initialHeight);
+        if (srcIsUrl && options.initialWidth != null && options.initialHeight != null) {
+          setSize(self.$videoElement, options.initialWidth, options.initialHeight);
         }
+        var autoplay = options.autoplay || (!!src && !srcIsUrl);
         self.controls.visible = false;
         self.playOverlay.visible = false;
 
         theVideo.onloadedmetadata = function() {
           if (srcIsUrl) {
-            // Set the width of the container to match the intrinsic width of the video.
-            resizer.addGoal(self, theVideo.videoWidth, theVideo.videoHeight).then(function() {
-              self.ele.css("width", theVideo.videoWidth);
-              self.controls.visible = srcIsUrl;
-              self.playOverlay.visible = true;
-            });
+            if (options.useOriginalSize) {
+              // Set the width of the container to match the intrinsic width of the video.
+              resizer.addGoal(self, theVideo.videoWidth, theVideo.videoHeight).then(function() {
+                self.ele.css("width", theVideo.videoWidth);
+              });
+            }
+            self.controls.visible = true;
+            self.playOverlay.visible = autoplay;
           }
           else {
             self.ele.css("width", theVideo.videoWidth);
@@ -151,7 +160,7 @@ define([ "jquery", "ui/button", "ui/component", "ui/sizegoal" ], function($, But
 
         theVideo.src = srcIsUrl ? src : "";
         theVideo.srcObject = srcIsUrl ? null : src;
-        theVideo.autoplay = options.autoplay || (!!src && !srcIsUrl);
+        theVideo.autoplay = autoplay;
         theVideo.muted = !srcIsUrl;
         if (src == null) {
           promise.resolve(theVideo);
