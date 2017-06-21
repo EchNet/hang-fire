@@ -175,6 +175,23 @@ div {
   left: 0px;
   width: 100%;
 }
+#app .listing .actionGroup {
+  display: inline-block;
+  width: 470px;
+  margin-right: 16px;
+  vertical-align: top;
+}
+#app .listing .actionGroup.inbox {
+  width: 660px;
+}
+#app .listing .actionGroup div.header {
+  color: #686;
+  width: 452px;
+  padding-left: 6px;
+  background: rgba(220,220,220,0.4);
+  margin: 3px;
+  border-radius: 3px;
+}
 #app .listing .item {
   border-radius: 6px;
   margin: 0px 6px 6px 0px;
@@ -182,7 +199,6 @@ div {
   background-color: white;
   color: #004;
   box-shadow: 2px 2px 2px 2px rgba(0,0,0,0.2);
-  width: 440px;
   height: 64px;
   overflow: hidden;
   position: relative;
@@ -197,7 +213,7 @@ div {
 #app .listing .item .content {
   position: absolute;
   top: 4px;
-  left: 80px;
+  right: 8px;
   width: 378px;
   text-align: right;
 }
@@ -401,22 +417,4 @@ span.hilite {
 .subtle {
   font-style: italic;
   font-size: 12px;
-}
-.actionGroup {
-  margin-top: 10px;
-  border-top: 1px;
-}
-.actionGroup {
-  display: inline-block;
-  width: 470px;
-  margin-right: 16px;
-  vertical-align: top;
-}
-.actionGroup div.header {
-  color: #686;
-  width: 452px;
-  padding-left: 6px;
-  background: rgba(220,220,220,0.4);
-  margin: 3px;
-  border-radius: 3px;
 }

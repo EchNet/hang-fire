@@ -23,6 +23,7 @@ define([ "jquery", "ui/index", "services" ], function($, ui, Services) {
     function renderItem(self, actionItem) {
       return $("<div>")
         .addClass("item")
+        .addClass(actionItem.topic)
         .append($("<img>")
           .addClass("bigIcon")
           .attr("src", actionItem.iconUrl))
@@ -49,7 +50,10 @@ define([ "jquery", "ui/index", "services" ], function($, ui, Services) {
       if (actionGroups) {
         for (var i = 0; i < actionGroups.length; ++i) {
           var actionGroup = actionGroups[i];
-          var div = $("<div>").addClass("actionGroup").appendTo(self.ele);
+          var div = $("<div>")
+            .addClass("actionGroup")
+            .addClass(actionGroup.class)
+            .appendTo(self.ele);
           var headerText = null;
           if (actionGroups.length > 1) {
             switch (actionGroup.class) {
