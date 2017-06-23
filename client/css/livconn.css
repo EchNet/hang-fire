@@ -175,14 +175,14 @@ div {
   left: 0px;
   width: 100%;
 }
+#app .listing {
+  position: relative
+  width: 100%;
+}
 #app .listing .actionGroup {
   display: inline-block;
   width: 470px;
-  margin-right: 16px;
   vertical-align: top;
-}
-#app .listing .actionGroup.inbox {
-  width: 660px;
 }
 #app .listing .actionGroup div.header {
   color: #686;
@@ -203,7 +203,14 @@ div {
   overflow: hidden;
   position: relative;
 }
+#app .listing .actionGroup.inbox .item {
+  background: rgba(255,255,240,1);
+  box-shadow: 3px 3px 3px 3px rgba(20,20,20,0.2);
+}
 #app .listing .item:hover {
+  background-color: #fff8e8;
+}
+#app .listing .actionGroup.inbox .item:hover {
   background-color: #fff8e8;
 }
 #app .listing .item .bigIcon {

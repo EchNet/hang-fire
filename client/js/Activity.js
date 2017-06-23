@@ -63,10 +63,7 @@ function($,        ui,         Services) {
 
       saveForm: function(data) {
         var actionItem = this.options.actionItem;
-        return Services.apiService.saveForm(actionItem.topic, actionItem.aspect, data)
-        .then(function() {
-          Services.sessionManager.refreshNow();
-        });
+        return Services.apiService.saveForm(actionItem.topic, actionItem.aspect, data);
       },
 
       exit: function() {

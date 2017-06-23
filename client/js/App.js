@@ -99,7 +99,9 @@ function($,        Services,   Login,   Listing,   ActionItem,   ActivityStarter
           Main_openActionItem(self, actionItem);
         },
         exit: function() {
-          Main_showListing(self);
+          Services.sessionManager.refreshNow().then(function() {
+            Main_showListing(self);
+          });
         }
       });
     }

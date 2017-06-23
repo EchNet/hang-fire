@@ -1,4 +1,4 @@
-// session.js
+// SessionManager.js
 
 define([ "jquery", "util/Cookie", "util/HttpMethod", "ui/observable", "ActionItem" ],
 function($,        Cookie,        HttpMethod,        Observable,      ActionItem) {
@@ -112,7 +112,8 @@ function($,        Cookie,        HttpMethod,        Observable,      ActionItem
   function startPolling(self) {
     if (!self.pollInterval) {
       function poll() {
-        new POLL()
+        self.pollCount += 1;
+        return new POLL()
         .setSalt(salt())
         .execute()
         .then(function(results) {
@@ -121,10 +122,9 @@ function($,        Cookie,        HttpMethod,        Observable,      ActionItem
         .catch(function(error) {
           handleAError(self, error);
         });
-        self.pollCount += 1;
       }
-      poll();
       self.pollInterval = setInterval(poll, self.pollingPeriod);
+      return poll();
     }
   }
 
@@ -193,7 +193,7 @@ function($,        Cookie,        HttpMethod,        Observable,      ActionItem
 
   function refreshNow(self) {
     stopPolling(self);
-    startPolling(self);
+    return startPolling(self);
   }
 
   function SessionManager(options) {
