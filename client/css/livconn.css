@@ -181,12 +181,12 @@ div {
 }
 #app .listing .actionGroup {
   display: inline-block;
-  width: 470px;
+  width: 490px;
   vertical-align: top;
 }
 #app .listing .actionGroup div.header {
   color: #686;
-  width: 452px;
+  width: 472px;
   padding-left: 6px;
   background: rgba(220,220,220,0.4);
   margin: 3px;
@@ -221,7 +221,7 @@ div {
   position: absolute;
   top: 4px;
   right: 8px;
-  width: 378px;
+  width: 398px;
   text-align: right;
 }
 #app .listing .item .title {
