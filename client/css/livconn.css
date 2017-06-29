@@ -267,7 +267,6 @@ div {
 div.messageOptions {
   padding-bottom: 4px;
   border-bottom: dashed 1px #ddd;
-  text-align: right;
 }
 div.messageOptions button.plus {
   background-image: url(/img/plus.png);
@@ -291,9 +290,6 @@ div.messageView {
   position: absolute;
   width: 100%;
 }
-.messageViewer .overlay {
-  position: absolute;
-}
 div.video {
   position: relative;
 }
@@ -308,15 +304,15 @@ div.video .counter {
 div.video .overlay {
   background-image: url(/img/playbutton.png);
   background-repeat: no-repeat;
-  width: 25%;
-  height: 25%;
+  width: 90%;
+  height: 90%;
   position: absolute;
   left: 0%;
   right: 0%;
   top: 0%;
   bottom: 0%;
   margin: auto;
-  background-size: contain;
+  background-size: 100px 100px;
   background-position: center;
   opacity: .5;
   -webkit-transition: opacity .3s;
@@ -326,11 +322,17 @@ div.video .overlay {
   transition: opacity .3s;
   cursor: pointer;
 }
+div.video .overlay button {
+  position: absolute;
+}
+div.video .overlay .topRight {
+  right: 0;
+}
 div.video .controls {
   padding: 2px 8px 2px 40px;
   position: relative;
 }
-div.video button {
+div.video .controls button {
   width: 30px;
   height: 30px;
   background-color: transparent;
@@ -339,17 +341,17 @@ div.video button {
   cursor: pointer;
   background-size: 18px 18px;
 }
-div.video button.restart {
+div.video .controls button.restart {
   position: absolute;
   left: 4px;
   background-image: url(/img/restartbutton.png);
 }
-div.video button.fullScreen {
+div.video .controls button.fullScreen {
   position: absolute;
   right: 0px;
   background-image: url(/img/fullscreenbutton.png);
 }
-div.video progress {
+div.video .controls progress {
   height: 30px;
   width: 100%;
 }

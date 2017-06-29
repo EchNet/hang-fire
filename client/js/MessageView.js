@@ -14,7 +14,7 @@ function(ui,         When ) {
           self.invokePlugin("requestMaximize");
         }
       });
-      self.videoPlayer = new ui.Video().setVisible(false).addPlugin(self); 
+      self.videoPlayer = new ui.Video({ minimizedWidth: 40, maximizedWidth: 320 }).setVisible(false).addPlugin(self); 
       var descrElement = new ui.Component({ cssClass: "subtle" }).setText(self.description);
       self.append(self.thumb).append(self.videoPlayer).append(descrElement);
 

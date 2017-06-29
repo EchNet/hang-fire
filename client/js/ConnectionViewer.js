@@ -3,6 +3,12 @@
 define([ "jquery", "Activity", "ui/index", "ActionItem", "Services", "VideoRecorder", "MessageView" ],
 function($,        Activity,     ui,       ActionItem,   Services,   VideoRecorder, MessageView ) {
 
+  //var resizer = new SizeGoal({ componentProperty: "$videoElement" });
+        //resizer.addGoal(self, theVideo.videoWidth, theVideo.videoHeight).then(function() {
+        //resizer.addGoal(self, self.options.maximizedWidth, 240).then(function() {
+         // self.ele.css("width", options.maximizedWidth);
+        //});
+
   return Activity.defineClass(function(c) {
 
     function addControls(self) {

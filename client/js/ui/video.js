@@ -4,25 +4,32 @@
 
 define([ "jquery", "ui/button", "ui/component", "ui/sizegoal" ], function($, Button, Component, SizeGoal) {
 
-  var resizer = new SizeGoal({ componentProperty: "$videoElement" });
-
   return Component.defineClass(function(c) {
+
+    // The root element is a div.  There are the following children:
+    // - The video element itself,
+    // - An optional div for controls,
+    // - An overlay container shown when the video is paused.
+    // an optional div for controls.  All sizing operations offered by this component 
+    // pertain to the root div, not to the video.  The video should be given (via CSS)
+    // width 100% or height 100%, so that it follows the size of the root div and maintains
+    // aspect ratio.  The controls div should be positioned so that it does not interfere 
+    // with the sizing of the video.  The overlay must be styled appropriately.
 
     c.defineDefaultOptions({
       cssClass: "video",
-      initialWidth: null,
-      initialHeight: null,
-      useCustomControls: true,
-      useOriginalSize: false,
-      showFullScreenButton: false
+      controlsCssClass: "controls",
+      useOriginalWidth: false,     // if true, when video is loaded, set the container width
+                                   // to the width of the vide.
+      useOriginalHeight: false,    // if true, when video is loaded, set the container height
+                                   // to the height of the vide.
+      showRestartButton: false,
+      showProgressBar: false,
+      showFullScreenButton: false,
+      autoplay: false             // play on load
     });
 
-    function setSize($ele, width, height) {
-      $ele.css("width", width);
-      $ele.css("height", height);
-    }
-
-    function initControls(self) {
+    function init(self) {
 
       function playOrPause() {
         var video = self.videoElement;
@@ -42,11 +49,13 @@ define([ "jquery", "ui/button", "ui/component", "ui/sizegoal" ], function($, But
       }
 
       function showPlaying() {
-        self.playOverlay.visible = false;
+        self.overlay.visible = false;
+        self.invokePlugin("playbackStart", self.videoElement);
       }
 
       function showPaused() {
-        self.playOverlay.visible = true;
+        self.overlay.visible = true;
+        self.invokePlugin("playbackStop", self.videoElement);
       }
 
       function showProgress() {
@@ -54,7 +63,9 @@ define([ "jquery", "ui/button", "ui/component", "ui/sizegoal" ], function($, But
         var currentTime = video.currentTime || 0;
         var duration = isFinite(video.duration) ? video.duration : 10;
         var percentage = Math.min(100, Math.floor((100 / duration) * currentTime));
-        self.progressBar.ele.val(percentage);
+        if (self.progressBar) {
+          self.progressBar.ele.val(percentage);
+        }
 
         if ((currentTime >= 2 || percentage >= 100) && !self.viewNotified) {
           self.viewNotified = true;
@@ -76,17 +87,6 @@ define([ "jquery", "ui/button", "ui/component", "ui/sizegoal" ], function($, But
         showProgress();
       }
 
-      self.playOverlay = new Component("<div class='overlay'>").addPlugin({
-        onClick: playOrPause
-      });
-      self.restartButton = new Button({ cssClass: "restart" }).addPlugin({
-        onClick: restart
-      });
-      self.progressBar = new Component("<progress min='0' max='100' value='0'>");
-      self.fullScreenButton = new Button({ cssClass: "fullScreen" }).addPlugin({
-        onClick: fullScreen
-      });
-
       // jQuery is unable to handle creation of video elements.
       self.ele.html("<video></video>");
       var video = self.videoElement;
@@ -96,63 +96,70 @@ define([ "jquery", "ui/button", "ui/component", "ui/sizegoal" ], function($, But
       video.addEventListener("ended", postMortem);
       video.addEventListener("timeupdate", showProgress);
 
-      self.controls = new Component("<div class='controls'>");
-      self.controls.ele
-        .append(self.restartButton.ele)
-        .append(self.progressBar.ele)
+      self.controls = new Component("<div>", { cssClass: self.options.controlsCssClass });
+
+      function addControl(control) {
+        self.controls.ele.append(control.ele)
+      }
+
+      if (self.options.showRestartButton) {
+        var restartButton = new Button({ cssClass: "restart" }).addPlugin({
+          onClick: restart
+        });
+        addControl(restartButton);
+      }
+
+      if (self.options.showProgressBar) {
+        self.progressBar = new Component("<progress min='0' max='100' value='0'>");
+        addControl(self.progressBar);
+      }
 
       if (self.options.showFullScreenButton) {
-        self.controls.ele.append(self.fullScreenButton.ele)
+        var fullScreenButton = new Button({ cssClass: "fullScreen" }).addPlugin({
+          onClick: fullScreen
+        });
+        addControl(fullScreenButton)
       }
-    }
 
-    // The outer element is usually a div.  The div contains two elements: the video and a container
-    // for controls.
-    c.defineInitializer(function() {
-      var self = this;
-      initControls(self);
-      self.ele.append(self.playOverlay.ele);
-      if (self.options.useCustomControls) {
-        self.ele.append(self.controls.ele);
-      }
-      else {
+      if (!self.controls) {  // Some random behavior: if no custom controls specified, use built-in controls.
         self.videoElement.controls = true;
       }
-      if (self.options.initialWidth != null && self.options.initialHeight != null) {
-        setSize(self.$videoElement, self.options.initialWidth, self.options.initialHeight);
-      }
+
+      self.overlay = new Component("<div class='overlay'>").addPlugin({
+        onClick: playOrPause
+      });
+      self.ele.append(self.overlay.ele);
+    }
+
+    c.defineInitializer(function() {
+      init(this);
     });
 
     c.extendPrototype({
-      load: function(src, options) {
+      load: function(src) {
         var self = this;
-        options = options || {};
         var promise = $.Deferred();
         var theVideo = self.videoElement;
         var srcIsUrl = typeof src == "string";
-        if (srcIsUrl && options.initialWidth != null && options.initialHeight != null) {
-          setSize(self.$videoElement, options.initialWidth, options.initialHeight);
-        }
-        var autoplay = options.autoplay || (!!src && !srcIsUrl);
+        var autoplay = self.options.autoplay || (!!src && !srcIsUrl);
         self.controls.visible = false;
-        self.playOverlay.visible = false;
+        self.overlay.visible = false;
 
         theVideo.onloadedmetadata = function() {
-          if (srcIsUrl) {
-            if (options.useOriginalSize) {
-              // Set the width of the container to match the intrinsic width of the video.
-              resizer.addGoal(self, theVideo.videoWidth, theVideo.videoHeight).then(function() {
-                self.ele.css("width", theVideo.videoWidth);
-              });
-            }
-            self.controls.visible = true;
-            self.playOverlay.visible = autoplay;
-          }
-          else {
+          if (self.options.useOriginalWidth) {
+            // Set the width of the container to match the intrinsic width of the video.
             self.ele.css("width", theVideo.videoWidth);
-            setSize(self.$videoElement, theVideo.videoWidth, theVideo.videoHeight);
           }
+          if (self.options.useOriginalHeight) {
+            // Set the height of the container to match the intrinsic height of the video.
+            self.ele.css("height", theVideo.videoHeight);
+          }
+          if (srcIsUrl && self.controls) {
+            self.controls.visible = true;
+          }
+          self.overlay.visible = !autoplay;
           promise.resolve(theVideo);
+          self.invokePlugin("videoLoaded", theVideo);
         }
         theVideo.onerror = function(err) {
           promise.reject(err);

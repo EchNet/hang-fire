@@ -46,6 +46,8 @@ define([ "jquery", "Asset", "util/When" ], function($, Asset, When) {
       return span("Update announcement");
     case "gre-in":
       return span().append(span("New videogram from ")).append(hilite(data.user.name || ("User " + data.user.id)));
+    case "gre-cre":
+      return span().append(span("Record a videogram for ")).append(hilite(data.user.name || ("User " + data.user.id)));
     case "con-new":
     case "con-out":
       return hilite(data.user.name || ("User " + data.user.id));
