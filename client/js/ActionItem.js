@@ -36,6 +36,10 @@ define([ "jquery", "Asset", "util/When" ], function($, Asset, When) {
     return span(txt);
   }
 
+  function printUserName(data) {
+    return hilite(data.user.name || ("User " + data.user.id));
+  }
+
   function titleFunc(topic, aspect, data) {
     switch (topic + "-" + aspect) {
     case "ann-rec":
@@ -45,12 +49,12 @@ define([ "jquery", "Asset", "util/When" ], function($, Asset, When) {
     case "ann-upd":
       return span("Update announcement");
     case "gre-in":
-      return span().append(span("New videogram from ")).append(hilite(data.user.name || ("User " + data.user.id)));
+      return span().append(span("New videogram from ")).append(printUserName(data));
     case "gre-cre":
-      return span().append(span("Record a videogram for ")).append(hilite(data.user.name || ("User " + data.user.id)));
+      return span().append(span("Record a videogram for ")).append(printUserName(data));
     case "con-new":
     case "con-out":
-      return hilite(data.user.name || ("User " + data.user.id));
+      return span().append(span("Your conversation with ")).append(printUserName(data));
     case "inv-rec":
       return span("You have an invitation");
     case "inv-cre":

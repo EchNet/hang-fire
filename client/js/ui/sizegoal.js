@@ -30,31 +30,53 @@ define([ "jquery" ], function($) {
     }
   }
 
+  function animateWidth(animation, goal) {
+    var elapsedTime = now() - goal.startTime;
+    var component = goal.component;
+    var width = animation.getCssValue(component, "width");
+    var targetWidth = goal.targetWidth;
+    if (Math.abs(targetWidth - width) < animation.epsilon) {
+      animation.setCssValue(component, "width", targetWidth);
+      return false;
+    }
+    var delta = (targetWidth - width) * (1.0 - Math.pow(animation.decay, elapsedTime));
+    animation.setCssValue(component, "width", width + delta);
+    return true;
+  }
+
+  function animateHeight(animation, goal) {
+    var elapsedTime = now() - goal.startTime;
+    var component = goal.component;
+    var height = animation.getCssValue(component, "height");
+    var targetHeight = goal.targetHeight;
+    if (Math.abs(targetHeight - height) < animation.epsilon) {
+      animation.setCssValue(component, "height", targetHeight);
+      return false;
+    }
+    var delta = (targetHeight - height) * (1.0 - Math.pow(animation.decay, elapsedTime));
+    animation.setCssValue(component, "height", height + delta);
+    return true;
+  }
+
   function kick(animation) {
     (function step() {
       setTimeout(function() {
         for (var i = 0; i < animation.goals.length; ) {
           var goal = animation.goals[i];
-          var elapsedTime = now() - goal.startTime;
-          var component = goal.component;
-          var width = animation.getCssValue(component, "width");
-          var height = animation.getCssValue(component, "height");
-          var targetWidth = goal.targetWidth;
-          var targetHeight = goal.targetHeight;
-          if (Math.abs(targetWidth - width) < animation.epsilon &&
-              Math.abs(targetHeight - height) < animation.epsilon) {
-            animation.setCssValue(component, "width", targetWidth);
-            animation.setCssValue(component, "height", targetHeight);
-            goal.promise.resolve(component);
-            animation.goals.splice(i, 1);
+          var keepGoing = false;
+          if (goal.targetWidth != null) {
+            keepGoing = animateWidth(animation, goal);
+          }
+          if (goal.targetHeight != null) {
+            keepGoing = animateHeight(animation, goal) || keepGoing;
+          }
+          if (keepGoing) {
+            goal.startTime = now();
+            ++i;
           }
           else {
-            var delta = (targetWidth - width) * (1.0 - Math.pow(animation.decay, elapsedTime));
-            animation.setCssValue(component, "width", width + delta);
-            delta = (targetHeight - height) * (1.0 - Math.pow(animation.decay, elapsedTime));
-            animation.setCssValue(component, "height", height + delta);
-            ++i;
-            goal.startTime = now();
+            goal.promise.resolve(goal.component);
+            animation.goals.splice(i, 1);
           }
         }
 

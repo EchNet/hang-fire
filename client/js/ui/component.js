@@ -63,6 +63,11 @@ define([ "jquery", "ui/observable" ], function($, Observable) {
   Component.prototype = $.extend(Object.create(Observable.prototype), {
     DEFAULT_OPTIONS: { html: "<div>" },
 
+    addClass: function(className) {
+      this.ele.addClass(className);
+      return this;
+    },
+
     append: function(child) {
       this.ele.append(child.ele);
       return this;

@@ -1,8 +1,8 @@
 // MessageViewer.js - Component for viewing an incoming message.
 // After the video plays, function buttons are shown.
 
-define([ "jquery", "Activity", "ui/index", "ActionItem", "Services", "MessageView" ],
-function($,        Activity,   ui,         ActionItem,   Services,   MessageView ) {
+define([ "jquery", "Activity", "ui/index", "ActionItem", "Services" ],
+function($,        Activity,   ui,         ActionItem,   Services) {
 
   return Activity.defineClass(function(c) {
 

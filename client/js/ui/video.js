@@ -2,7 +2,7 @@
 // Sourced by either string (URL) or stream.
 // Has custom controls.
 
-define([ "jquery", "ui/button", "ui/component", "ui/sizegoal" ], function($, Button, Component, SizeGoal) {
+define([ "jquery", "ui/button", "ui/component" ], function($, Button, Component) {
 
   return Component.defineClass(function(c) {
 
@@ -129,6 +129,8 @@ define([ "jquery", "ui/button", "ui/component", "ui/sizegoal" ], function($, But
         onClick: playOrPause
       });
       self.ele.append(self.overlay.ele);
+
+      self.restart = restart;
     }
 
     c.defineInitializer(function() {
@@ -181,6 +183,11 @@ define([ "jquery", "ui/button", "ui/component", "ui/sizegoal" ], function($, But
 
       pause: function() {
         this.videoElement.pause();
+        return this;
+      },
+
+      replay: function() {
+        this.restart();
         return this;
       }
     });

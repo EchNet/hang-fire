@@ -312,7 +312,7 @@ div.video .overlay {
   top: 0%;
   bottom: 0%;
   margin: auto;
-  background-size: 100px 100px;
+  background-size: 20% 20%;
   background-position: center;
   opacity: .5;
   -webkit-transition: opacity .3s;

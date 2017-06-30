@@ -1,21 +1,114 @@
 // ConnectionViewer.js - Component for recording and viewing messages to/from a connection.
 
-define([ "jquery", "Activity", "ui/index", "ActionItem", "Services", "VideoRecorder", "MessageView" ],
-function($,        Activity,     ui,       ActionItem,   Services,   VideoRecorder, MessageView ) {
+define([ "jquery", "Activity", "ui/index", "ActionItem", "Services", "util/When" ],
+function($,        Activity,   ui,         ActionItem,   Services,   When ) {
 
-  //var resizer = new SizeGoal({ componentProperty: "$videoElement" });
-        //resizer.addGoal(self, theVideo.videoWidth, theVideo.videoHeight).then(function() {
-        //resizer.addGoal(self, self.options.maximizedWidth, 240).then(function() {
-         // self.ele.css("width", options.maximizedWidth);
-        //});
+  var resizer = new ui.SizeGoal();
+
+  function logView(message) {
+    Services.apiService.logEvent({ type: 'view', messageId: message.id });
+  }
+
+  var MessageView = ui.Component.defineClass(function(c) {
+
+    var minimizedWidth = 40;
+    var maximizedWidth = 320;
+
+    c.defineInitializer(function() {
+      var self = this;
+      self.videoPlayer = new ui.Video().addPlugin({
+        onClick: function() {
+          if (!self.maximized) {
+            self.invokePlugin("requestMaximize");
+          }
+        },
+        notifyView: function() {
+          logView(self.message);
+        }
+      });
+      self.videoPlayer.ele.css("width", minimizedWidth);
+      var descrElement = new ui.Component().addClass("subtle").setText(self.description);
+      self.append(self.videoPlayer).append(descrElement);
+    });
+
+    c.defineProperty("message", {
+      get: function() {
+        return this.options.message;
+      }
+    });
+
+    c.defineProperty("asset", {
+      get: function() {
+        return this.message && this.message.asset;
+      }
+    });
+
+    c.defineProperty("videoUrl", {
+      get: function() {
+        return this.asset && this.asset.url;
+      }
+    });
+
+    c.defineProperty("user", {
+      get: function() {
+        return this.options.user;
+      }
+    });
+
+    c.defineProperty("sender", {
+      get: function() {
+        if (this.message && this.user) {
+          return this.message.fromUserId == this.user.id ? this.user.name : "you";
+        }
+        return "??";
+      }
+    });
+
+    c.defineProperty("when", {
+      get: function() {
+        return this.message ? When.formatRelativeTime(Date.parse(this.message.createdAt)) : "??";
+      }
+    });
+
+    c.defineProperty("description", {
+      get: function() {
+        return "From " + this.sender + " " + this.when;
+      }
+    });
+
+    c.extendPrototype({
+      open: function() {
+        this.videoPlayer.load(this.videoUrl);
+      },
+      close: function() {
+        this.videoPlayer.clear();
+        return this;
+      },
+      minimize: function() {
+        var self = this;
+        self.videoPlayer.pause();
+        resizer.addGoal(self.videoPlayer, minimizedWidth);
+        self.maximized = false;
+        return self;
+      },
+      maximize: function() {
+        var self = this;
+        self.maximized = true;
+        resizer.addGoal(self.videoPlayer, maximizedWidth).then(function() {
+          self.videoPlayer.replay();
+        });
+        return this;
+      },
+    });
+  });
 
   return Activity.defineClass(function(c) {
 
-    function addControls(self) {
+    function init(self) {
 
       var user = self.actionItem.user;
+      var userName = user.name || "your connection";
       var thread = self.actionItem.thread;
-      var wouldBeReply = thread.length && thread[0].fromUserId == user.id;
 
       function requestMaximize(ix) {
         for (var i = 0; i < self.messageViews.length; ++i) {
@@ -23,36 +116,27 @@ function($,        Activity,     ui,       ActionItem,   Services,   VideoRecord
         }
       }
 
-      function toReplyState() {
-        var userName = self.actionItem.user.name || "your connection";
-        self.title = $("<span>").text(wouldBeReply ? "Reply to " : "Send videogram to ").append($("<span class='hilite'>").text(userName));
-        self.playerView.visible = false;
-        self.videoRecorder.visible = true;
-        self.videoRecorder.open();
-        return self;
-      }
-
-      function toPlaybackState() {
-        self.playerView.visible = true;
-        self.videoRecorder.visible = false;
-        return self;
-      }
-
       function makeMessageOptions() {
-        var labelText = wouldBeReply ? "Reply" : ("Send " + (thread.length ? "another" : "a") + " videogram");
-        var label = new ui.Component("<span>").setText(labelText + " ");
         var button = new ui.Button({ cssClass: "plus" });
-        return new ui.Component({ cssClass: "messageOptions" })
-          .append(label)
+        var label = new ui.Component("<span>");
+        label.ele
+          .append($("<span>").text("Send "))
+          .append($("<span class='hilite'>").text(userName))
+          .append($("<span>").text(" a videogram"));
+        return new ui.Component()
+          .addClass("messageOptions")
           .append(button)
-          .addPlugin({ onClick: toReplyState });
+          .append(label)
+          .addPlugin({ onClick: function() {
+            // Open reply activity.
+            self.openOther(new ActionItem({ id: "gre-cre", user: user }));
+          }});
       }
 
-      function logView(message) {
-        Services.apiService.logEvent({ type: 'view', messageId: message.id });
-      }
-
-      self.playerView.append(makeMessageOptions());
+      self.messageViews = [];
+      var panel = new ui.Component().addClass("panel");
+      self.append(panel);
+      panel.append(makeMessageOptions());
 
       for (var i = 0; i < thread.length; ++i) {
         (function(i) {
@@ -66,32 +150,15 @@ function($,        Activity,     ui,       ActionItem,   Services,   VideoRecord
             requestMaximize: function() {
               requestMaximize(i);
             },
-            notifyView: function() {
-              logView(message);
-            }
           });
-          self.playerView.append(messageView);
+          panel.append(messageView);
           self.messageViews.push(messageView);
         })(i);
       }
-
-      self.toReplyState = toReplyState;
-      self.toPlaybackState = toPlaybackState;
     }
 
     c.defineInitializer(function() {
-      var self = this;
-      self.messageViews = [];
-      self.playerView = new ui.Component({ cssClass: "panel" }).setVisible(false);
-      self.videoRecorder = new VideoRecorder().addPlugin(self).setVisible(false);
-
-      self.ele
-        .append($("<div>").addClass("body")
-          .append(self.playerView.ele)
-          .append(self.videoRecorder.ele)
-        )
-
-      addControls(self);
+      init(this);
     });
 
     c.extendPrototype({
@@ -99,17 +166,14 @@ function($,        Activity,     ui,       ActionItem,   Services,   VideoRecord
         for (var i = 0 ; i < this.messageViews.length; ++i) {
           this.messageViews[i].open();
         }
-        return this.messageViews.length ? this.toPlaybackState() : this.toReplyState();
+        return this;
       },
       close: function() {
         for (var i = 0 ; i < this.messageViews.length; ++i) {
           this.messageViews[i].close();
         }
         return this;
-      },
-      saveMessage: function(assetId) {
-        return this.saveForm({ toUserId: this.actionItem.user.id, assetId: assetId });
-      },
+      }
     });
   });
 });
