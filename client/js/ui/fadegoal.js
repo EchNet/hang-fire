@@ -59,7 +59,7 @@ define([ "jquery" ], function($) {
     })();
   }
 
-  function addGoal(animation, component, fadeIn) {
+  function addGoal(animation, component, fadeIn, startOver) {
     for (var i = 0; i < animation.goals.length; ++i) {
       if (animation.goals[i].component == component) {
         animation.goals[i].targetOpacity = fadeIn ? 1 : 0;
@@ -70,16 +70,21 @@ define([ "jquery" ], function($) {
     var promise = $.Deferred();
 
     var prevVisible = component.visible;
-    component.visible = true;
-    if (!prevVisible) {
-      setComponentOpacity(component, 0);
+    var initialOpacity;
+    if (startOver) {
+      initialOpacity = fadeIn ? 0 : 1;
+    }
+    else if (!prevVisible) {
+      initialOpacity = 0;
     }
     else {
-      var opacity = getComponentOpacity(component);
-      if (opacity == null || opacity == "") {
-        setComponentOpacity(component, 1);
+      initialOpacity = getComponentOpacity(component);
+      if (initialOpacity == null || initialOpacity == "") {
+        initialOpacity = 1;
       }
     }
+    setComponentOpacity(component, initialOpacity);
+    component.visible = true;
 
     animation.goals.push({
       component: component,
@@ -94,8 +99,8 @@ define([ "jquery" ], function($) {
     return promise;
   }
 
-  FadeGoal.prototype.addGoal = function(component, fadeIn) {
-    return addGoal(this, component, fadeIn);
+  FadeGoal.prototype.addGoal = function(component, fadeIn, startOver) {
+    return addGoal(this, component, fadeIn, startOver);
   }
 
   return FadeGoal;

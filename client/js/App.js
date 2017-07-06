@@ -114,7 +114,7 @@ function($,        Services,   Login,   Listing,   ActionItem,   ActivityStarter
         self.fadeGoal.addGoal(self.listing, 0);
       }
       Main_closeCurrentActivity(self);
-      self.fadeGoal.addGoal(activity, 1).then(function() {
+      self.fadeGoal.addGoal(activity, 1, 1).then(function() {
         self.activity = activity;
         activity.open();
       });
