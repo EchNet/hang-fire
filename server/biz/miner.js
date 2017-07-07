@@ -13,6 +13,7 @@ function Miner(user) {
   self.announcements = [];
   self.incomingInvitations = [];
   self.outgoingInvitations = [];
+  self.outgoingReminders = [];
   self.others = {};
 }
 
@@ -107,6 +108,16 @@ function getIncomingInvitations(miner) {
   })
 }
 
+function getOutgoingReminders(miner) {
+  return models.Reminder.findByFromUserId(miner.user.id, {
+    deep: 1,
+    excludeClosed: 1
+  })
+  .then(function(reminders) {
+    return miner.outgoingReminders = reminders || [];
+  })
+}
+
 Miner.prototype.run = function() {
   var miner = this;
   return exec.executeGroup(miner, [
@@ -114,7 +125,8 @@ Miner.prototype.run = function() {
     getAnnouncements,
     getConnections,
     getOutgoingInvitations,
-    getIncomingInvitations
+    getIncomingInvitations,
+    getOutgoingReminders
   ])
 }
 

@@ -47,7 +47,7 @@ module.exports = function(sequelize, DataTypes) {
     models = _models;
     Reminder.belongsTo(models.User, { as: "fromUser" });
     Reminder.belongsTo(models.User, { as: "toUser" });  
-    Reminder.belongsTo(models.Asset, {as: "asset"});  
+    Reminder.belongsTo(models.Asset, { as: "asset" });  
   }
 
   function destroyAll() {
@@ -58,20 +58,19 @@ module.exports = function(sequelize, DataTypes) {
     return Reminder.findAll({
       where: { fromUserId: userId },
       include: [{
-        model: models.Users,
+        model: models.User,
         as: "toUser",
         required: true
       },
       {
-        model: models.Users,
+        model: models.User,
         as: "fromUser",
         required: true
       },            
       {
-        model: models.Assets,
+        model: models.Asset,
         as: "asset"  
-      }],     
-      order: [ [ "status", "deliverAt" ] ]
+      }]     
     })
   }
 

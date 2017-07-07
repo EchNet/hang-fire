@@ -89,6 +89,10 @@ function createActionItems(compiler) {
       addActionItem(1, createActionItem("inv-cre"));
     }
 
+    forEach(compiler.outgoingReminders, function(rem) {
+      addActionItem(2, createActionItem("rem-upd", { reminder: rem }));
+    });
+
     addActionItem(2, createActionItem("usr-upd"));
 
     if (compiler.user.level <= 0) {    // admin
