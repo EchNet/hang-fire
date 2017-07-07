@@ -36,8 +36,17 @@ define([ "jquery", "Asset", "util/When" ], function($, Asset, When) {
     return span(txt);
   }
 
-  function printUserName(data) {
-    return hilite(data.user.name || ("User " + data.user.id));
+  function printUser(user) {
+    return hilite(user.name || ("User " + user.id));
+  }
+
+  function formatDeliverAt(time) {
+    var hrs = parseInt(time.substring(0, time.length - 2));
+    var ampm = hrs >= 12 ? "PM" : "AM";
+    if (hrs > 12) hrs -= 12;
+    else if (hrs == 0) hrs = 12;
+    var mins = time.substring(time.length - 2);
+    return hrs + ":" + mins + " " + ampm;
   }
 
   function titleFunc(topic, aspect, data) {
@@ -49,12 +58,12 @@ define([ "jquery", "Asset", "util/When" ], function($, Asset, When) {
     case "ann-upd":
       return span("Update announcement");
     case "gre-in":
-      return span().append(span("New videogram from ")).append(printUserName(data));
+      return span().append(span("New videogram from ")).append(printUser(data.user));
     case "gre-cre":
-      return span().append(span("Record a videogram for ")).append(printUserName(data));
+      return span().append(span("Record a videogram for ")).append(printUser(data.user));
     case "con-new":
     case "con-out":
-      return span().append(span("Your conversation with ")).append(printUserName(data));
+      return span().append(span("Your conversation with ")).append(printUser(data.user));
     case "inv-rec":
       return span("You have an invitation");
     case "inv-cre":
@@ -62,7 +71,9 @@ define([ "jquery", "Asset", "util/When" ], function($, Asset, When) {
     case "inv-upd":
       return span("Update invitation");
     case "rem-cre":
-      return span().append(span("Create a reminder for ")).append(printUserName(data));
+      return span().append(span("Create a reminder for ")).append(printUser(data.user));
+    case "rem-upd":
+      return span().append(span("Update your " + formatDeliverAt(data.reminder.deliverAt) + " reminder for ")).append(printUser(data.reminder.toUser));
     case "pro-cre":
       return span("Record your profile video");
     case "pro-upd":
@@ -107,7 +118,7 @@ define([ "jquery", "Asset", "util/When" ], function($, Asset, When) {
       }
     case "cre":
       if (topic == "usr") {
-        return "Choose how other Living Connections users will see you.";
+        return "Change your name or profile video";
       }
     }
     return span();
