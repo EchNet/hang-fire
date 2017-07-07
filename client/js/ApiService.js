@@ -129,6 +129,26 @@ define([ "util/HttpMethod" ], function(HttpMethod) {
     }
   }
 
+  function makePostReminder() {
+    var PostReminderMethod = new HttpMethod.PostForm()
+      .addPathComponent("api/reminders")
+      .addQueryParameter("toUserId")
+      .addQueryParameter("assetId")
+      .addQueryParameter("deliverAt")
+      .addQueryParameter("repeat")
+      .build();
+
+    return function(form) {
+      return new PostReminderMethod()
+        .setToUserId(form.toUserId)
+        .setAssetId(form.assetId)
+        .setDeliverAt(form.deliverAt)
+        .setRepeat(form.repeat)
+        .execute();
+    }
+  }
+
+
   function ApiService() {
 
     this.saveMethods = {
@@ -142,6 +162,9 @@ define([ "util/HttpMethod" ], function(HttpMethod) {
         "cre": makePostInvite(),
         "upd": makeUpdateInvite(),
         "del": makeDeleteInvite()
+      },
+      "rem": {
+        "cre": makePostReminder()
       }
     }
   }

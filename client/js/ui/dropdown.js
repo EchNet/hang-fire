@@ -12,15 +12,20 @@ define([ "jquery", "ui/component" ], function($, Component) {
       if (options) {
         for (var i = 0; i < options.length; ++i) {
           var opt = options[i];
-          var label, value;
+          var label, value, selected;
           if (typeof opt == "string") {
             label = value = opt;
           }
           else {
             label = opt.label;
             value = opt.value;
+            selected = opt.selected;
           }
-          self.ele.append($("<option>").text(label).val(value));
+          var optionElement = $("<option>").text(label).val(value);
+          if (selected) {
+            optionElement.attr("selected", "selected");
+          }
+          self.ele.append(optionElement);
         }
       }
     });

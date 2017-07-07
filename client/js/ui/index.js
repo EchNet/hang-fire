@@ -5,6 +5,7 @@
     "Audio",
     "Button",
     "Carton",
+    "Checkbox",
     "Component",
     "ConfirmButton",
     "DateTimeInput",
