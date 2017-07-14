@@ -117,34 +117,35 @@ function($,        Activity,   ui,         ActionItem,   Services,   When ) {
       }
 
       function makeMessageOptions() {
-        var replyHandler = { onClick: function() {
-          // Open reply activity.
-          self.openOther(new ActionItem({ id: "gre-cre", user: user }));
-        } }
-        var replyButton = new ui.Button({ cssClass: "plus" }).addPlugin(replyHandler);
-        var replyLabel = new ui.Component("<span>").addPlugin(replyHandler);
-        replyLabel.ele
-          .append($("<span>").text("Send "))
-          .append($("<span class='hilite'>").text(userName))
-          .append($("<span>").text(" a videogram"));
-        var spacer = new ui.Component("<span>&nbsp; &nbsp;</span>");
-        var remindHandler = { onClick: function() {
-          // Open remind activity.
-          self.openOther(new ActionItem({ id: "rem-cre", user: user }));
-        } }
-        var remindButton = new ui.Button({ cssClass: "plus" }).addPlugin(remindHandler);
-        var remindLabel = new ui.Component("<span>").addPlugin(remindHandler);
-        remindLabel.ele
-          .append($("<span>").text("Send "))
-          .append($("<span class='hilite'>").text(userName))
-          .append($("<span>").text(" a reminder"));
-        return new ui.Component()
-          .addClass("messageOptions")
-          .append(replyButton)
-          .append(replyLabel)
-          .append(spacer)
-          .append(remindButton)
-          .append(remindLabel)
+        var replyDiv = (function() {
+          var replyHandler = { onClick: function() {
+            // Open reply activity.
+            self.openOther(new ActionItem({ id: "gre-cre", user: user }));
+          } }
+          var replyButton = new ui.Button({ cssClass: "plus" }).addPlugin(replyHandler);
+          var replyLabel = new ui.Component("<span>").addPlugin(replyHandler);
+          replyLabel.ele
+            .append($("<span>").text("Send "))
+            .append($("<span class='hilite'>").text(userName))
+            .append($("<span>").text(" a videogram"));
+          return new ui.Component().append(replyButton).append(replyLabel);
+        })();
+
+        var remindDiv = (function() {
+          var remindHandler = { onClick: function() {
+            // Open remind activity.
+            self.openOther(new ActionItem({ id: "rem-cre", user: user }));
+          } }
+          var remindButton = new ui.Button({ cssClass: "plus" }).addPlugin(remindHandler);
+          var remindLabel = new ui.Component("<span>").addPlugin(remindHandler);
+          remindLabel.ele
+            .append($("<span>").text("Send "))
+            .append($("<span class='hilite'>").text(userName))
+            .append($("<span>").text(" a reminder"));
+          return new ui.Component().append(remindButton).append(remindLabel);
+        })();
+
+        return new ui.Component().addClass("messageOptions").append(replyDiv).append(remindDiv);
       }
 
       self.messageViews = [];
