@@ -61,7 +61,7 @@ const DEFAULTS = {
     type: "mailgun",
     domain: "mg.livingcx.com",
     apiKey: "key-1a42bcc21a15252b0de1fc4ab0540863",
-    from: "Rob Saltzman <rob@mg.livingcx.com>"
+    from: "Do Not Reply <do-not-reply@mg.livingcx.com>"
   }
 }
 
