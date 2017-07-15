@@ -20,6 +20,7 @@ function( ConnectionViewer,  MessageViewer, AnnouncementEditor,   CreateInviteEd
     if (actionItem.topic == "rem") {
       switch (actionItem.aspect) {
       case "cre":
+      case "upd":
         return CreateReminderEditor;
       }
     }

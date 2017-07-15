@@ -3,6 +3,58 @@
 define([ "jquery", "Activity", "VideoRecorder", "ui/index" ],
 function($,        Activity,   VideoRecorder,   ui) {
 
+  function updateReminderProps(self, editor, propNames) {
+    if (!self.actionItem.reminder) {
+      self.actionItem.reminder = {}
+    }
+    for (var i = 0; i < propNames.length; ++i) {
+      var propName = propNames[i];
+      if (editor[propName] != self.actionItem.reminder[propName]) {
+        self.actionItem.reminder[propName] = editor[propName];
+        self.actionItem.reminder.dirty = true;
+      }
+    }
+  }
+
+  function createOrUpdateReminder(self) {
+    var reminder = self.reminder;
+    return self.saveForm({
+      toUserId: reminder.toUser.id,
+      assetId: reminder.asset.id,
+      deliverAt: reminder.deliverAt,
+      repeat: reminder.repeat
+    });
+  }
+
+  function deleteReminder(self) {
+    alert("nyi");
+  }
+
+  var IntroView = ui.Component.defineClass(function(c) {
+
+    c.defineInitializer(function() {
+      var self = this;
+
+      self.okButton = ui.Button.create("Continue", function() {
+        self.invokePlugin("next");
+      });
+
+      self.ele.append($("<div>")
+        .append($("<div class='chunk'>").text("" + 
+            "A reminder is a videogram that is sent automatically to your connection " +
+            "on the schedule that you select."))
+        .append($("<div class='chunk'>").text("" + 
+            "You can use reminders to help someone remember an important appointment or " +
+            "medication schedule, or just to stay in touch."))
+        .append($("<div class='chunk'>").text("" +
+            "If you wish to continue, we will take you through the steps of setting up " +
+            "a schedule and recording a videogram."))
+        .append($("<div class='chunk'>")
+          .append(self.okButton.ele))
+      );
+    });
+  });
+
   var ScheduleEditor = ui.Component.defineClass(function(c) {
 
     function makeErrorLabel(text) {
@@ -15,7 +67,7 @@ function($,        Activity,   VideoRecorder,   ui) {
       }
     });
 
-    c.defineProperty("repeatHow", {
+    c.defineProperty("repeat", {
       get: function() {
         return this.repeatBox.value ? 1 : 0;
       }
@@ -83,29 +135,21 @@ function($,        Activity,   VideoRecorder,   ui) {
         self.invokePlugin("next");
       });
 
-      self.ele
-        .append($("<div>").addClass("panel")
-          .append($("<div>")
-            .append($("<span>").text("" + 
-              "A reminder is sent to your connection's Living Connections device or mobile " +
-              "phone automatically at the time that you select.")))
-          .append($("<div>")
-            .append($("<span>").text("Select a time of day to deliver your reminder.")))
-          .append($("<div style='padding-left:30px;'>")
-            .append($("<span class='subtle'>").text("Deliver at: "))
-            .append(self.deliverAtSelector.ele))
-          .append($("<div>")
-            .append($("<span>").text("" + 
-              "You may also set up your reminder to be delivered each day at the same time.")))
-          .append($("<div>")
-            .append($("<span>").text("" + 
-              "Check the box below to make your message repeat. ")))
-          .append($("<div style='padding-left:30px;'>")
-            .append(self.repeatBox.ele)
-            .append($("<span class='subtle'>").text("Repeat every day")))
-          .append($("<div>")
-            .append(self.okButton.ele))
-        )
+      self
+        .append(new ui.Component().addClass("chunk")
+          .setText("Select a time of day to deliver your reminder."))
+        .append(new ui.Component("<div style='padding-left:30px;'>").addClass("chunk")
+          .append(new ui.Component("<span class='subtle'>").setText("Deliver at: "))
+          .append(self.deliverAtSelector))
+        .append(new ui.Component().addClass("chunk")
+          .append(new ui.Component().setText("" +
+            "You may also set up your reminder to be delivered every day at the same time."))
+          .append(new ui.Component().setText("Check the box below to make your message repeat."))
+          .append(new ui.Component("<div style='padding-left:30px;'>").addClass("chunk")
+            .append(self.repeatBox)
+            .append(new ui.Component("<span class='subtle'>").setText("Repeat every day"))))
+        .append(new ui.Component().addClass("chunk")
+          .append(self.okButton))
     });
 
     c.extendPrototype({
@@ -115,43 +159,155 @@ function($,        Activity,   VideoRecorder,   ui) {
     });
   });
 
+  var SummaryView = ui.Carton.defineClass(function(c) {
+
+    function formatDeliverAt(time) {
+      var hrs = parseInt(time.substring(0, time.length - 2));
+      var ampm = hrs >= 12 ? "PM" : "AM";
+      if (hrs > 12) hrs -= 12;
+      else if (hrs == 0) hrs = 12;
+      var mins = time.substring(time.length - 2);
+      return hrs + ":" + mins + " " + ampm;
+    }
+
+    c.defineInitializer(function() {
+      var self = this;
+
+      self.prompt = new ui.Component();
+
+      var scheduleView = (function() {
+        var prompt = new ui.Component().addClass("subtle").setText("Schedule:");
+        self.scheduleLabel = new ui.Component();
+        var changeButton = ui.Button.create("change", function() {
+          self.invokePlugin("editSchedule");
+        });
+        return new ui.Component().addClass("chunk").append(prompt).append(self.scheduleLabel).append(changeButton);
+      })();
+
+      var videoView = (function() {
+        var prompt = new ui.Component().addClass("subtle").setText("Videogram:");
+        self.videoPlayer = new ui.Video().addPlugin({
+          onClick: function() {
+            self.videoPlayer.replay();
+          }
+        });
+        self.videoPlayer.ele.css("width", 240);
+        var changeButton = ui.Button.create("change", function() {
+          self.invokePlugin("editVideo");
+        });
+        return new ui.Component().addClass("chunk").append(prompt).append(self.videoPlayer).append(changeButton);
+      })();
+
+      var buttons = (function() {
+        self.saveButton = ui.Button.create("Save", function() {
+          createOrUpdateReminder(self.options.parent);
+        });
+        self.activateButton = ui.Button.create("Activate", function() {
+          createOrUpdateReminder(self.options.parent);
+        });
+        self.deleteButton = ui.Button.create("Delete reminder", function() {
+          deleteReminder(self.options.parent);
+        });
+        return new ui.Component().addClass("chunk").append(self.saveButton).append(self.activateButton).append(self.deleteButton);
+      })();
+
+      self.append(prompt).append(scheduleView).append(videoView).append(buttons);
+    });
+
+    function open(self) {
+      var parent = self.options.parent;
+      var reminder = parent.actionItem.reminder;
+      var isUpdate = !!reminder.id;
+      var repeat = reminder.repeat;
+      var deliverAt = reminder.deliverAt;
+      var assetUrl = reminder.asset && reminder.asset.url;
+
+      self.prompt.text =  isUpdate
+        ? (reminder.dirty ? "Click save to make changes." : "You have activated a reminder.")
+        : "Your reminder is ready to be activated. " +
+          "It will not be activated until you click the Activate button below.";
+
+      var scheduleText = (repeat ? "Every day at " : "One time at ") + formatDeliverAt(deliverAt);
+      self.scheduleLabel.setText(scheduleText);
+
+      if (assetUrl) {
+        self.videoPlayer.load(assetUrl);
+      }
+
+      self.activateButton.visible = !isUpdate;
+      self.saveButton.visible = reminder.dirty && isUpdate;
+      self.deleteButton.visible = isUpdate;
+      return self;
+    }
+
+    c.extendPrototype({
+      open: function() {
+        open(this);
+        return this;
+      },
+      close: function() {
+        this.videoPlayer.clear();
+        return this;
+      },
+    });
+  });
+
   return Activity.defineClass(function(c) {
 
     c.defineInitializer(function() {
       var self = this;
-      self.scheduleEditor = new ScheduleEditor().addPlugin({
+      var isUpdate = self.isUpdate = !!self.actionItem.reminder;
+      self.toUser = isUpdate ?  self.actionItem.reminder.toUser : self.actionItem.user;
+      self.carton = new ui.Carton({ cssClass: "panel", initialState: isUpdate ? "summaryView" : "introView" });
+
+      self.introView = new IntroView().setVisible(false).addPlugin({
         next: function() {
-          self.openVideoRecorder();
+          self.carton.show("scheduleEditor");
         }
       });
-      self.ele.append(self.scheduleEditor.ele)
+      self.carton.addCompartment("introView", self.introView);
+
+      self.scheduleEditor = new ScheduleEditor().setVisible(false).addPlugin({
+        next: function() {
+          updateReminderProps(self, self.scheduleEditor, [ "repeat", "deliverAt" ]);
+          self.carton.show("videoRecorder");
+        }
+      });
+      self.carton.addCompartment("scheduleEditor", self.scheduleEditor);
 
       self.videoRecorder = new VideoRecorder("<div>", {
+        acceptButtonLabel: "Use it",
         what: "reminder"
-      }).addPlugin(self).setVisible(false);
-      self.ele.append(self.videoRecorder.ele)
+      }).setVisible(false).addPlugin({
+        saveMessage: function() {
+          updateReminderProps(self, self.videoRecorder, [ "asset" ]);
+          self.carton.show("summaryView");
+        },
+      });
+      self.carton.addCompartment("videoRecorder", self.videoRecorder);
+
+      self.summaryView = new SummaryView({
+        parent: self,
+        toUser: self.toUser
+      }).setVisible(false).addPlugin({
+        editSchedule: function() {
+          self.carton.show("scheduleEditor");
+        },
+        editVideo: function() {
+          self.carton.show("videoRecorder");
+        }
+      });
+      self.carton.addCompartment("summaryView", self.summaryView);
+      self.append(self.carton);
     });
 
-    function openVideoRecorder(self) {
-      self.scheduleEditor.setVisible(false).close();
-      self.videoRecorder.setVisible(true).open();
-    }
-
     c.extendPrototype({
-      openVideoRecorder: function() {
-        return openVideoRecorder(this);
-      },
-      saveMessage: function(assetId) {
-        var self = this;
-        return self.saveForm($.extend({}, self.data, {
-          toUserId: self.actionItem.user.id,
-          assetId: assetId,
-          deliverAt: self.scheduleEditor.deliverAt,
-          repeat: self.scheduleEditor.repeatHow
-        }));
+      open: function () {
+        this.carton.open();
+        return this;
       },
       close: function() {
-        this.videoRecorder.close();
+        this.carton.close();
         return this;
       }
     });

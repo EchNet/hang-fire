@@ -204,6 +204,7 @@ function($,        Services,   ui,         WaitAnim) {
       self.videoBlob = null;
       return Services.apiService.saveVideo(videoBlob)
       .then(function(asset) {
+        self.asset = asset;
         return self.videoComponent.load(asset.url)
         .then(function() {
           return self.invokePlugin("saveMessage", asset.id);

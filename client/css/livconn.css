@@ -365,6 +365,9 @@ video {
   border-top: dashed 1px #96a090;
   padding: 5px 20px;
 }
+#app .activity .chunk {
+  margin: 9px 0px;
+}
 #app .activity .panel > div {
   margin: 9px 0px;
 }
