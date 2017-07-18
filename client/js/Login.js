@@ -24,53 +24,43 @@ function($,        ui,         FacebookButton, WaitAnim,   Services) {
     c.defineInitializer(function() {
       var self = this;
 
-      var emailInput = new ui.EmailInput().addPlugin({
+      self.emailInput = new ui.EmailInput().addPlugin({
         submit: function(text) {
           submit(self, text);
         },
         showInvalid: function() {
           self.messageBox.text = "That doesn't look like an email address.  Please retype it and try again.";
-        }
-      });
-      emailInput.addChangeListener(function() {
-        if (emailInput.valid && emailInput.enabled) {
-          self.messageBox.text = "";
+        },
+        onChange: function() {
+          if (self.emailInput.valid && self.emailInput.enabled) {
+            self.messageBox.text = "";
+          }
         }
       });
 
-      var fbButton = ui.Button.create("Log in through Facebook", function() {
+      self.fbButton = ui.Button.create("Log in through Facebook", function() {
         self.invokePlugin("openFacebookForm");
       });
 
-      var sendButton = ui.Button.create("OK", function() {
+      self.sendButton = ui.Button.create("Send request", function() {
         emailInput.submit();
-      });
+      }).addClass("sendEmail");
 
-      var messageBox = new ui.Component();
+      self.messageBox = ui.div();
 
-      self.ele
-        .append($("<div>").addClass("big").addClass("chunk")
-          .text("Log in to Living Connections"))
-        //.append($("<div>").addClass("chunk")
-          //.append(fbButton.ele.addClass("useFb")))
-        //.append($("<div>").addClass("big").addClass("chunk")
-          //.text("OR"))
-        .append($("<div>").addClass("form")
-          .append($("<div>").text("Please enter your email address:"))
-          .append($("<div>").addClass("indent")
-            .append($("<div>").addClass("prompt")
-              .text("EMAIL ADDRESS"))
-            .append($("<div>")
-              .append(emailInput.ele))
-            .append($("<div>")
-              .append(sendButton.ele.addClass("sendEmail")))
-          )
+      self
+        .append(ui.div().addClass("big").addClass("title")
+          .setText("Log in to Living Connections"))
+        .append(ui.div().addClass("chunk")
+           .setText("Login to Living Connections is by invitation only.  " +
+              "Ask a Living Connections user for an invitation."))
+        .append(ui.div().addClass("chunk")
+          .setText("Or you may request an invitation by email below."))
+        .append(ui.div().addClass("chunk").addClass("indent")
+          .append(ui.div().addClass("prompt").setText("YOUR EMAIL ADDRESS"))
+          .append(ui.div().append(self.emailInput))
+          .append(ui.div().append(self.sendButton))
         );
-
-      self.messageBox = messageBox;
-      self.emailInput = emailInput;
-      self.sendButton = sendButton;
-      self.fbButton = fbButton;
     });
 
     c.extendPrototype({
@@ -88,13 +78,13 @@ function($,        ui,         FacebookButton, WaitAnim,   Services) {
 
     c.defineInitializer(function() {
       var self = this;
-      self.ele
-        .append($("<div>").addClass("big").addClass("chunk")
-          .text("Log in to Living Connections"))
-        .append($("<div>").addClass("chunk")
-          .text("We have just sent a link, usable any time within the next 24 hours, to your email address. Go to your email and click the link to log in to Living Connections."))
-        .append($("<div>").addClass("chunk")
-          .text("You may close this window."))
+      self
+        .append(ui.div().addClass("big").addClass("title")
+          .setText("Log in to Living Connections"))
+        .append(ui.div().addClass("chunk")
+          .setText("We have just sent a link, usable any time within the next 24 hours, to your email address. Go to your email and click the link to log in to Living Connections."))
+        .append(ui.div().addClass("chunk")
+          .setText("You may close this window."))
     });
   });
 

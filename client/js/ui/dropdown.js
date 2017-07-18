@@ -37,7 +37,6 @@ define([ "jquery", "ui/component" ], function($, Component) {
       set: function(val) {
         if (val != this.value) {
           this.ele.val(val);
-          this.notifyChangeListeners();
         }
       }
     });

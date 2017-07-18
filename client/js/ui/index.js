@@ -29,7 +29,11 @@
   }
 
   define(getPaths(), function() {
-    var module = {};
+    var module = {
+      div: function() {
+        return new module.Component();
+      }
+    };
     for (var i = 0; i < CLASS_LIST.length; ++i) {
       module[CLASS_LIST[i]] = arguments[i];
     }

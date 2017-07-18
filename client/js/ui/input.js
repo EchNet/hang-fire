@@ -11,7 +11,6 @@ define([ "jquery", "ui/component", ], function($, Component) {
 
     function onChange(self) {
       self.clearStyles();
-      self.notifyChangeListeners();   // deprecated
       self.invokePlugin("onChange", self.value);
     }
 
@@ -60,7 +59,6 @@ define([ "jquery", "ui/component", ], function($, Component) {
         val = this._filterInValue(val);
         if (val != this.input.val()) {
           this.input.val(val);
-          this.notifyChangeListeners();
         }
       }
     });

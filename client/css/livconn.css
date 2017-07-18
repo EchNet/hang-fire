@@ -55,7 +55,7 @@ div {
   font-size: 24px;
   color: #670;
 }
-#login .chunk {
+#login .title {
   text-align: center;
   width: 100%;
   margin: 15px 0px;
@@ -63,13 +63,13 @@ div {
 #login .message {
   color: red;
 }
-#login .form {
-  margin-left: 75px;
-  font-size: 20px;
+#login .chunk {
+  margin: 10px 30px;
+  font-size: 16px;
 }
 #login .indent {
   padding-top: 10px;
-  margin-left: 20px;
+  padding-left: 20px;
 }
 #login .prompt {
   font-size: 12px;
@@ -78,7 +78,7 @@ div {
 #login button {
   color: #840;
   background-color: white;
-  font-size: 18px;
+  font-size: 16px;
   border-radius: 8px;
 }
 #login button:disabled {
@@ -102,7 +102,7 @@ div {
 }
 #login input[type=text] {
   width: 285px;
-  font-size: 20px;
+  font-size: 16px;
   margin: 4px 0px;
 }
 #login .fbForm {
