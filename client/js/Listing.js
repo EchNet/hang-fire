@@ -76,6 +76,7 @@ define([ "jquery", "ui/index", "services" ], function($, ui, Services) {
             var actionItem = actionGroup.actions[j];
             firstActionItem = firstActionItem || actionItem;
             renderItem(self, actionItem).appendTo(div);
+            ++actionItemCount;
           }
         }
       }

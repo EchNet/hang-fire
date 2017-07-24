@@ -233,7 +233,6 @@ div {
   font-style: italic;
 }
 #app .activity {
-  background-color: white;
   border-radius: 6px;
   color: #004;
   box-shadow: 2px 2px 2px 2px rgba(0,0,0,0.2);
@@ -242,6 +241,7 @@ div {
 #app .activity .header {
   position: relative;
   height: 40px;
+  background-color: white;
 }
 #app .activity .header .icon {
   padding: 4px;
