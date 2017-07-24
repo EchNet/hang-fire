@@ -129,13 +129,19 @@ function($,        Services,   Activity,   Asset,   ActionItem,   ui,         Wa
       var asset = user.asset && new Asset(user.asset);
       var panel = $("<div class='panel'>");
       panel.append($("<div>")
-        .text("You may also introduce yourself to other users in a profile video. " +
-              "Your profile video is visible to other members you invite or connect with. " +
+        .text("You may also introduce yourself to other users by recording a profile video. " +
+              "Your profile video is shown to other members you invite or connect with. " +
               "We also select a frame from the video to use as your profile picture."));
       if (asset) {
         panel
           .append($("<div>").text("Here is your current profile picture:"))
           .append($("<div class='thumb'>").append(new ui.Image().setSrc(asset.thumbnailUrl).ele));
+      }
+      else {
+        panel.append($("<div>")
+          .text("If you have not done so already, you will have to allow Living Connections " +
+                "to use your computer's camera and microphone by clicking a button that pops " +
+                "up in your brower."));
       }
       panel.append($("<div>")
         .append(self.openProfileVideoEditorButton.ele)
