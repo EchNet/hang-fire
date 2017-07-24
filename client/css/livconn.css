@@ -363,13 +363,13 @@ video {
 }
 #app .activity .panel {
   border-top: dashed 1px #96a090;
-  padding: 5px 20px;
+  padding: 5px;
 }
 #app .activity .chunk {
-  margin: 9px 0px;
+  margin: 5px 0px;
 }
 #app .activity .panel > div {
-  margin: 9px 0px;
+  margin: 5px 0px;
 }
 #app button {
   background-color: white;
