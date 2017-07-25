@@ -128,7 +128,7 @@ function($,        Activity,   ui,         ActionItem,   Services,   When ) {
             .append($("<span>").text("Send "))
             .append($("<span class='hilite'>").text(userName))
             .append($("<span>").text(" a videogram"));
-          return new ui.Component().append(replyButton).append(replyLabel);
+          return new ui.Component().addClass("left").append(replyButton).append(replyLabel);
         })();
 
         var remindDiv = (function() {
@@ -142,7 +142,7 @@ function($,        Activity,   ui,         ActionItem,   Services,   When ) {
             .append($("<span>").text("Send "))
             .append($("<span class='hilite'>").text(userName))
             .append($("<span>").text(" a reminder"));
-          return new ui.Component().append(remindButton).append(remindLabel);
+          return new ui.Component().addClass("right").append(remindButton).append(remindLabel);
         })();
 
         return new ui.Component().addClass("messageOptions").append(replyDiv).append(remindDiv);

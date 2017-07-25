@@ -94,13 +94,13 @@ function($,        Services,   Activity,   Asset,   ActionItem,   ui,         Wa
       }
 
       self.nameInput = createNameInput();
+      self.nameInput.value = getUserName();
       self.updateButton = createUpdateButton();
       self.openProfileVideoEditorButton = createOpenProfileVideoEditorButton();
       self.waitAnim = new WaitAnim($("<span>"), { ndots: 3 }).setVisible(false);
       self.updatedMsg = new ui.Component("<span class='subtle'>").setText("User name updated").setVisible(false);
 
       self._open = function() {
-        self.nameInput.value = getUserName();
         unblock();
         setTimeout(function() {
           self.nameInput.select().focus();

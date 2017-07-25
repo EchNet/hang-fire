@@ -127,7 +127,7 @@ define([ "jquery", "ui/button", "ui/component" ], function($, Button, Component)
 
       self.overlay = new Component("<div class='overlay'>").addPlugin({
         onClick: playOrPause
-      });
+      }).setVisible(false);
       self.ele.append(self.overlay.ele);
 
       self.restart = restart;

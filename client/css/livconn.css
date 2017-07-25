@@ -267,6 +267,18 @@ div {
 div.messageOptions {
   padding-bottom: 4px;
   border-bottom: dashed 1px #ddd;
+  position: relative;
+}
+div.messageOptions .left {
+  width: 45%;
+  top: 0px;
+}
+div.messageOptions .right {
+  position: absolute;
+  width: 45%;
+  top: 0px;
+  right: 0px;
+  text-align: right;
 }
 div.messageOptions button.plus {
   background-image: url(/img/plus.png);
@@ -312,7 +324,7 @@ div.video .overlay {
   top: 0%;
   bottom: 0%;
   margin: auto;
-  background-size: 20% 20%;
+  background-size: 40% 50%;
   background-position: center;
   opacity: .5;
   -webkit-transition: opacity .3s;
