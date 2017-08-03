@@ -19,11 +19,11 @@ define([ "jquery", "ui/component", ], function($, Component) {
       self._enabled = true;
       self.container.append($("<input>")
         .on("focus", function() {
-          self.invokePlugin("onFocus", self.value);
+          self.invokePlugin("onFocus", self);
         })
         .on("blur", function() {
           self.validate();
-          self.invokePlugin("onBlur", self.value);
+          self.invokePlugin("onBlur", self);
         })
         .on("keydown", function(event) {
           if (self.enabled && event.originalEvent.keyCode == 13) {
@@ -48,6 +48,12 @@ define([ "jquery", "ui/component", ], function($, Component) {
     c.defineProperty("input", {
       get: function() {
         return this.container.find("input");
+      }
+    });
+
+    c.defineProperty("element", {
+      get: function() {
+        return this.input.get(0);
       }
     });
 

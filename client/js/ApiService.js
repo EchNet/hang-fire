@@ -42,19 +42,6 @@ define([ "util/HttpMethod" ], function(HttpMethod) {
     }
   }
 
-  function makeDeleteAnnouncement() {
-    var DeleteAnnouncementMethod = new HttpMethod.DeleteForm()
-      .addPathComponent("api/messages")
-      .addPathParameter("id")
-      .build();
-
-    return function(form) {
-      return new DeleteAnnouncementMethod()
-        .setId(form.id)
-        .execute();
-    }
-  }
-
   function makePostGreeting() {
     var PostGreetingMethod = new HttpMethod.PostForm()
       .addPathComponent("api/messages")
@@ -116,19 +103,6 @@ define([ "util/HttpMethod" ], function(HttpMethod) {
     }
   }
 
-  function makeDeleteInvite() {
-    var DeleteInviteMethod = new HttpMethod.DeleteForm()
-      .addPathComponent("api/invites")
-      .addPathParameter("id")
-      .build();
-
-    return function(form) {
-      return new DeleteInviteMethod()
-        .setId(form.id)
-        .execute();
-    }
-  }
-
   function makePostReminder() {
     var PostReminderMethod = new HttpMethod.PostForm()
       .addPathComponent("api/reminders")
@@ -148,6 +122,17 @@ define([ "util/HttpMethod" ], function(HttpMethod) {
     }
   }
 
+  function makeDeleteMethod(what) {
+    var DeleteMethod = new HttpMethod.DeleteForm()
+      .addPathComponent("api")
+      .addPathComponent(what)
+      .addPathParameter("id")
+      .build();
+
+    return function(form) {
+      return new DeleteMethod().setId(form.id).execute();
+    }
+  }
 
   function ApiService() {
 
@@ -155,16 +140,17 @@ define([ "util/HttpMethod" ], function(HttpMethod) {
       "ann": {
         "cre": makePostAnnouncement(),
         "upd": makeUpdateAnnouncement(),
-        "del": makeDeleteAnnouncement()
+        "del": makeDeleteMethod("messages")
       },
       "con": makePostGreeting(),
       "inv": {
         "cre": makePostInvite(),
         "upd": makeUpdateInvite(),
-        "del": makeDeleteInvite()
+        "del": makeDeleteMethod("invites")
       },
       "rem": {
-        "cre": makePostReminder()
+        "cre": makePostReminder(),
+        "del": makeDeleteMethod("reminders")
       }
     }
   }

@@ -30,7 +30,7 @@ define([ "ui/component" ], function(Component) {
     function addCompartment(self, key, component) {
       self.compartments[key] = component;
       if (!self.options.noAppend) {
-        self.container.append(component.container);
+        self.append(component);
       }
       var visible = self.options.initialState == null || inState(self, self.options.initialState, key);
       component.visible = visible;
