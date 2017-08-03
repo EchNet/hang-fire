@@ -27,10 +27,11 @@ function( ConnectionViewer,  MessageViewer, AnnouncementEditor,   CreateInviteEd
         return ReminderEditor;
       case "usr":
         return UserNameEditor;
-      case "rec":
-      case "in":
-        return MessageViewer;
       }
+      break;
+    case "rec":
+    case "in":
+      return MessageViewer;
     }
   }
 
