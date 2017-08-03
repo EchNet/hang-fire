@@ -1,41 +1,36 @@
 // ActivityStarter.js - logic for selecting, creating, and initializing an activity.
 
 define([ "ConnectionViewer", "MessageViewer", "AnnouncementEditor", "CreateInviteEditor", "ProfileVideoEditor",
-  "UpdateInviteEditor", "UserNameEditor", "CreateReminderEditor", "CreateGreetingEditor" ],
+  "UpdateInviteEditor", "UserNameEditor", "ReminderEditor", "CreateGreetingEditor" ],
 function( ConnectionViewer,  MessageViewer, AnnouncementEditor,   CreateInviteEditor, ProfileVideoEditor,
-  UpdateInviteEditor,   UserNameEditor,   CreateReminderEditor, CreateGreetingEditor) {
+  UpdateInviteEditor,   UserNameEditor,   ReminderEditor, CreateGreetingEditor) {
 
   function classForActionItem(actionItem) {
-    if (actionItem.topic == "inv") {
-      switch (actionItem.aspect) {
-      case "cre":
-        return CreateInviteEditor;
-      case "upd":
-        return UpdateInviteEditor;
-      }
-    }
     if (actionItem.topic == "con") {
       return ConnectionViewer;
     }
-    if (actionItem.topic == "rem") {
-      switch (actionItem.aspect) {
-      case "cre":
-      case "upd":
-        return CreateReminderEditor;
+    var isCreate = false;
+    switch (actionItem.aspect) {
+    case "cre":
+      isCreate = true;
+    case "upd":
+      switch (actionItem.topic) {
+      case "ann":
+        return AnnouncementEditor;
+      case "gre":
+        return CreateGreetingEditor;
+      case "inv":
+        return isCreate ? CreateInviteEditor : UpdateInviteEditor;
+      case "pro":
+        return ProfileVideoEditor;
+      case "rem":
+        return ReminderEditor;
+      case "usr":
+        return UserNameEditor;
+      case "rec":
+      case "in":
+        return MessageViewer;
       }
-    }
-    if (actionItem.aspect == "rec" || actionItem.aspect == "in") {
-      return MessageViewer;
-    }
-    switch (actionItem.topic) {
-    case "ann":
-      return AnnouncementEditor;
-    case "gre":
-      return CreateGreetingEditor;
-    case "pro":
-      return ProfileVideoEditor;
-    case "usr":
-      return UserNameEditor;
     }
   }
 
