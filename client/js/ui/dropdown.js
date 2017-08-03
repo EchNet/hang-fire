@@ -28,6 +28,9 @@ define([ "jquery", "ui/component" ], function($, Component) {
           self.ele.append(optionElement);
         }
       }
+      self.ele.on("change paste", function() {
+        self.invokePlugin("onChange", self.value);
+      });
     });
 
     c.defineProperty("value", {

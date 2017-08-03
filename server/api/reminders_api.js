@@ -95,11 +95,11 @@ router.put("/:id", function(req, res) {
         return reminder;
       }
 
-      var deliverAt = resloveDeliverDate(fields.deliverAt, fields.timeZone);
+      //var deliverAt = resolveDeliverDate(fields.deliverAt, fields.timeZone);
 
       return reminder.updateAttributes({
         assetId: fields.assetId,
-        deliverAt: deliverAt ,
+        deliverAt: fields.deliverAt,
         timeZone : fields.timeZone
       });
     }));

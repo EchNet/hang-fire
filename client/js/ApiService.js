@@ -122,6 +122,25 @@ define([ "util/HttpMethod" ], function(HttpMethod) {
     }
   }
 
+  function makeUpdateReminder() {
+    var UpdateReminderMethod = new HttpMethod.PutForm()
+      .addPathComponent("api/reminders")
+      .addPathParameter("id")
+      .addQueryParameter("assetId")
+      .addQueryParameter("deliverAt")
+      .addQueryParameter("repeat")
+      .build();
+
+    return function(form) {
+      return new UpdateReminderMethod()
+        .setId(form.id)
+        .setAssetId(form.assetId)
+        .setDeliverAt(form.deliverAt)
+        .setRepeat(form.repeat)
+        .execute();
+    }
+  }
+
   function makeDeleteMethod(what) {
     var DeleteMethod = new HttpMethod.DeleteForm()
       .addPathComponent("api")
@@ -150,6 +169,7 @@ define([ "util/HttpMethod" ], function(HttpMethod) {
       },
       "rem": {
         "cre": makePostReminder(),
+        "upd": makeUpdateReminder(),
         "del": makeDeleteMethod("reminders")
       }
     }

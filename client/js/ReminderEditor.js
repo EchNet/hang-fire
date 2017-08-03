@@ -60,7 +60,7 @@ function($,        Services,   Activity,   VideoRecorder,   ui) {
           { label: "10:30 AM", value: "1030" },
           { label: "11:00 AM", value: "1100" },
           { label: "11:30 AM", value: "1130" },
-          { label: "12:00 PM", value: "1200", selected: 1 },
+          { label: "12:00 PM", value: "1200" },
           { label: "12:30 PM", value: "1230" },
           { label: "1:00 PM", value: "1300" },
           { label: "1:30 PM", value: "1330" },
@@ -192,6 +192,7 @@ function($,        Services,   Activity,   VideoRecorder,   ui) {
         return Services.apiService.saveForm("rem", reminder.id == null ? "cre" : "upd", reminder)
         .then(function(responseObject) {
           reminder.id = responseObject.id;
+          self.invokePlugin("exit");
         });
       }
 
@@ -200,6 +201,7 @@ function($,        Services,   Activity,   VideoRecorder,   ui) {
           id: reminder.id,
         }).then(function() {
           reminder.id = null;
+          self.invokePlugin("exit");
         });
       }
 
@@ -255,6 +257,7 @@ function($,        Services,   Activity,   VideoRecorder,   ui) {
     c.defineInitializer(function() {
       var self = this;
       var reminder = self.actionItem.reminder || {
+        deliverAt: "1200",
         toUserId: self.actionItem.user.id,
         toUser: self.actionItem.user
       }
