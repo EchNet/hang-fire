@@ -14,23 +14,20 @@ function createAsset(creatorId, mime, key, url) {
   })
 }
 
-function upload(req, res) {
-  return videoStoreConnector.saveVideo(req.body)
-  .then(function(info) {
-    return createAsset(req.user.id, req.get("Content-type"), info.key, info.url);
-  })
-}
-
-function adminCreate(req, res) {
-  return createAsset(req.user.id, req.body.mime, req.body.key, req.body.url);
-}
-
 // Create
 router.post("/", function(req, res) {
   if (!req.user) {
     res.jsonError({ status: 401 });
   }
-  res.jsonResultOf(req.is("video/*") ? upload(req, res) : adminCreate(req, res));
+  var mime = req.get("Content-Type");
+  if (!mime.startsWith("video/")) {
+    res.jsonError({ status: 503, mime: mime });
+  }
+  return res.jsonResultOf(
+    videoStoreConnector.saveVideo(req.body).then(function(info) {
+      return createAsset(req.user.id, mime, info.key, info.url);
+    })
+  )
 });
 
 // Retrieve (by id)

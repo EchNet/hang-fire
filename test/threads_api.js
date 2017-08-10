@@ -6,15 +6,10 @@ requestlc.describe("Threads API", function(client) {
   var theUser1, theUser2;
 
   beforeEach(function(done) {
-    client.makeRequest("POST", "/api/profile").asRoot().withData({
-      assetId: 1,
-      name: "User 1"
-    }).getJson().then(function(user) {
+    client.createUserProfile("User 1")
+    .then(function(user) {
       theUser1 = user;
-      return client.makeRequest("POST", "/api/profile").asRoot().withData({
-        assetId: 2,
-        name: "User 2"
-      }).getJson();
+      return client.createUserProfile("User 2")
     }).then(function(user) {
       theUser2 = user;
       done();
@@ -68,7 +63,7 @@ requestlc.describe("Threads API", function(client) {
   });
 
   it("returns 404 for missing user (1)", function(done) {
-    getThread(theUser1.id - 1, theUser2.id).asRoot().go()
+    getThread(theUser1.id * 2, theUser2.id).asRoot().go()
     .then(function(expector) {
       expector.expectStatusCode(404);
       done();
@@ -77,7 +72,7 @@ requestlc.describe("Threads API", function(client) {
   })
 
   it("returns 404 for missing user (2)", function(done) {
-    getThread(theUser1.id, theUser2.id + 1).asRoot().go()
+    getThread(theUser1.id, theUser2.id * 2).asRoot().go()
     .then(function(expector) {
       expector.expectStatusCode(404);
       done();

@@ -13,11 +13,7 @@ requestlc.describe("Invites API", function(client) {
 
   beforeEach(function(done) {
     fs.unlinkSync("tmp/email");
-    client.makeRequest("POST", "/assets").asUser(fromUserId).withData({
-      mime: "audio/shmaudio",
-      key: "abc",
-      url: "http://example.com/notfound.wmf"
-    }).getJson()
+    client.createAsset(fromUserId)
     .then(function(asset) {
       theAsset = asset;
       return client.makeRequest("POST", PATH).asUser(fromUserId).withData({

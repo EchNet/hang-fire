@@ -57,6 +57,10 @@ const DEFAULTS = {
       }
     }
   },
+  videostore: {
+    cloudinary: {
+    }
+  },
   email: {
     type: "mailgun",
     domain: "mg.livingcx.com",
@@ -77,7 +81,15 @@ const OVERRIDES = {
     auth: {
       enableExtHeaderAccess: true,
       enableAccessByUserId: true
-    },  
+    },
+    videostore: {
+      enableLocalStorage: true,
+      cloudinary: {
+        cloud_name: "living-connections",
+        api_key: "425898524282428",
+        api_secret: "7pPjCUilLoTETVKv9yRfrh-TwIo"
+      }
+    },
     clientServiceConfigurations: {
       sessionManager: {
         config: {
@@ -104,6 +116,13 @@ const OVERRIDES = {
     email: {
       __allowedRecipients: [ "ech@ech.net", "rob777@comcast.net", "james.echmalian@gmail.com" ],
       defaultRecipient: "ech@ech.net"
+    },
+    videostore: {
+      cloudinary: {
+        cloud_name: "living-connections",
+        api_key: "425898524282428",
+        api_secret: "7pPjCUilLoTETVKv9yRfrh-TwIo"
+      }
     }
   },
   test: {
@@ -115,8 +134,10 @@ const OVERRIDES = {
       }
     },
     auth: {
-      grantAdminToLocalRequest: true,    
       enableExtHeaderAccess: true
+    },
+    videostore: {
+      enableLocalStorage: true
     },
     email: {
       disabled: true

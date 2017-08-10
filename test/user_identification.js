@@ -1,61 +1,39 @@
 var expect = require("chai").expect;
 const requestlc = require("./common/requestlc");
 
-requestlc.describe("User identification", function(client) {
+requestlc.describe("Action list", function(client) {
 
-  // Methods...
+  const NAME = "Josephine";
+  var theUser;
 
-  function createUser(name, level) {
-    return client.makeRequest("POST", "/api/users")
-    .withData({
-      name: name,
-      level: level
+  beforeEach(function(done) {
+    client.createUser(NAME).then(function(user) {
+      theUser = user;
+      done();
     })
-    .asRoot().getJson();
-  }
-
-  function createEmailProfile(userId, email) {
-    return client.makeRequest("POST", "/api/emailprofiles")
-    .withData({
-      userId: userId,
-      email: email
-    })
-    .asRoot().getJson();
-  }
-
-  function fetchActionList(userId) {
-    return client.makeRequest("GET", "/a").asUser(userId).getJson();
-  }
-
-  // Tests...
+    .catch(done)
+  });
 
   it("includes user name", function(done) {
-    const NAME = "Josephine";
-    createUser(NAME)
-    .then(function(user) {
-      return fetchActionList(user.id);
-    })
+    client.fetchActionList(theUser.id)
     .then(function(actionResponse) {
       expect(actionResponse.user).to.exist;
       expect(actionResponse.user.name).to.equal(NAME);
       expect(actionResponse.user.email).to.not.exist;
       done();
     })
-    .catch(done);
+    .catch(done)
   });
 
   it("includes email if present", function(done) {
-    const EMAIL = "test@example.com";
-    createUser("Edwin")
-    .then(function(user) {
-      return createEmailProfile(user.id, EMAIL);
-    })
+    var email = client.uid() + "@example.com";
+    client.createEmailProfile(theUser.id, email)
     .then(function(emailProfile) {
-      return fetchActionList(emailProfile.userId);
+      return client.fetchActionList(theUser.id);
     })
     .then(function(actionResponse) {
       expect(actionResponse.user).to.exist;
-      expect(actionResponse.user.email).to.equal(EMAIL);
+      expect(actionResponse.user.email).to.equal(email.toLowerCase());
       done();
     })
     .catch(done);

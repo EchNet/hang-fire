@@ -51,9 +51,9 @@ requestlc.describe("Message views", function(client) {
     }
   }
 
-  function findInboxMessage(userActions, fromUser) {
+  function findInboxMessage(userActions, prefix, fromUser) {
     return findAction(userActions, function(item) {
-      return item.id == "con-in-" + fromUser.id;
+      return item.id.startsWith(prefix) && item.id.endsWith(fromUser.id);
     });
   }
 
@@ -78,16 +78,18 @@ requestlc.describe("Message views", function(client) {
 
   it("cause messages to disappear from inbox", function(done) {
     getUserActions(theUser2).then(function(userActions) {
-      var greetingAction = findInboxMessage(userActions, theUser1);
+      var greetingAction = findInboxMessage(userActions, "gre-", theUser1);
       expect(greetingAction).to.exist;
-      expect(greetingAction.thread).to.exist;
-      expect(greetingAction.thread.length).to.equal(1);
-      expect(greetingAction.thread[0].id).to.equal(theMessage.id);
+      var connAction = findInboxMessage(userActions, "con-", theUser1);
+      expect(connAction).to.exist;
+      expect(connAction.thread).to.exist;
+      expect(connAction.thread.length).to.equal(1);
+      expect(connAction.thread[0].id).to.equal(theMessage.id);
       return logViewEvent(theUser2.id, theMessage.id);
     }).then(function() {
       return getUserActions(theUser2);
     }).then(function(userActions) {
-      var greetingAction = findInboxMessage(userActions, theUser1);
+      var greetingAction = findInboxMessage(userActions, "gre-", theUser1);
       expect(greetingAction).to.not.exist;
       done();
     }).catch(done);

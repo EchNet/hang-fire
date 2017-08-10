@@ -25,6 +25,10 @@ requestlc.describe("Reminders processing", function(client) {
     return client.makeRequest("POST", uri).asRoot().getJson();
   }
 
+  beforeEach(function(done) {
+    client.deleteAllReminders().then(function(){ done() }).catch(done);
+  });
+
   it("does not send message prematurely", function(done) {
     var deliverAt = new Date();
     deliverAt.setYear(deliverAt.getYear() + 1);

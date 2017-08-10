@@ -13,19 +13,6 @@ requestlc.describe("Invitation flow:", function(client) {
 
   // Methods...
 
-  function createUser(name) {
-    return client.makeRequest("POST", "/api/users")
-    .withData({ name: name }).asRoot().getJson();
-  }
-
-  function createAsset(creatorId) {
-    return client.makeRequest("POST", "/assets").asUser(creatorId).withData({
-      mime: "audio/shmaudio",
-      key: "abc",
-      url: "http://example.com/notfound.wmf"
-    }).getJson();
-  }
-
   function sendInvitation(fromUserId, name, email, assetId) {
     return client.makeRequest("POST", "/api/invites")
     .asUser(fromUserId)
@@ -103,11 +90,11 @@ requestlc.describe("Invitation flow:", function(client) {
 
   // Create an invitation and its prerequisites.
   beforeEach(function(done) {
-    createUser(TEST_SENDER_NAME)
+    client.createUser(TEST_SENDER_NAME)
     .then(function(user) {
       expect(user.name).to.equal(TEST_SENDER_NAME);
       theSender = user;
-      return createAsset(theSender.id);
+      return client.createAsset(theSender.id);
     })
     .then(function(asset) {
       theAsset = asset;

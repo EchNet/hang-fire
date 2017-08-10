@@ -96,12 +96,12 @@ requestlc.describe("Actions related to connections", function(client) {
     it("augments action list (1)", function(done) {
       client.makeRequest("GET", "/a").asUser(theUser1.id).getJson()
       .then(function(response) {
-        var greetingAction = findAction(response, function(item) {
-          return item.user && item.user.id == theUser2.id;
+        var connAction = findAction(response, function(item) {
+          return item.user && item.user.id == theUser2.id && item.id.match(/^con-/);
         });
-        expect(greetingAction).to.exist;
-        expect(greetingAction.thread).to.exist;
-        expect(greetingAction.thread.length).to.equal(3);
+        expect(connAction).to.exist;
+        expect(connAction.thread).to.exist;
+        expect(connAction.thread.length).to.equal(3);
         done();
       })
       .catch(done);
@@ -110,12 +110,12 @@ requestlc.describe("Actions related to connections", function(client) {
     it("augments action list (2)", function(done) {
       client.makeRequest("GET", "/a").asUser(theUser2.id).getJson()
       .then(function(response) {
-        var greetingAction = findAction(response, function(item) {
-          return item.user && item.user.id == theUser1.id;
+        var connAction = findAction(response, function(item) {
+          return item.user && item.user.id == theUser1.id && item.id.match(/^con-/);
         });
-        expect(greetingAction).to.exist;
-        expect(greetingAction.thread).to.exist;
-        expect(greetingAction.thread.length).to.equal(3);
+        expect(connAction).to.exist;
+        expect(connAction.thread).to.exist;
+        expect(connAction.thread.length).to.equal(3);
         done();
       })
       .catch(done);
