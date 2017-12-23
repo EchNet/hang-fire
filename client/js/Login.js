@@ -43,7 +43,7 @@ function($,        ui,         FacebookButton, WaitAnim,   Services) {
       });
 
       self.sendButton = ui.Button.create("Send request", function() {
-        emailInput.submit();
+        self.emailInput.submit();
       }).addClass("sendEmail");
 
       self.messageBox = ui.div();
